@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.exception;
+package com.stackmob.sdk.net;
 
-public class StackMobException extends Exception {
-
-  private static final long serialVersionUID = 1L;
-
-  public StackMobException(String message) {
-    super(message);
-  }
-
+public enum HttpVerb {
+  GET, POST, PUT, DELETE
 }

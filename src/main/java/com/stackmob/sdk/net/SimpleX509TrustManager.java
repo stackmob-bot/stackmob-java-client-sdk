@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.net;
+package com.stackmob.sdk.net;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -27,12 +27,11 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 public class SimpleX509TrustManager implements X509TrustManager {
+
   private X509TrustManager standardTrustManager = null;
 
-  public SimpleX509TrustManager(KeyStore keystore)
-      throws NoSuchAlgorithmException, KeyStoreException {
-    TrustManagerFactory factory = TrustManagerFactory
-        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+  public SimpleX509TrustManager(KeyStore keystore) throws NoSuchAlgorithmException, KeyStoreException {
+    TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     factory.init(keystore);
     TrustManager[] trustmanagers = factory.getTrustManagers();
     if (trustmanagers.length == 0) {
@@ -45,8 +44,8 @@ public class SimpleX509TrustManager implements X509TrustManager {
    * @see javax.net.ssl.X509TrustManager#checkClientTrusted(X509Certificate[],
    *      String authType)
    */
-  public void checkClientTrusted(X509Certificate[] certificates,
-      String authType) throws CertificateException {
+  @Override
+  public void checkClientTrusted(X509Certificate[] certificates, String authType) throws CertificateException {
     standardTrustManager.checkClientTrusted(certificates, authType);
   }
 
@@ -54,8 +53,8 @@ public class SimpleX509TrustManager implements X509TrustManager {
    * @see javax.net.ssl.X509TrustManager#checkServerTrusted(X509Certificate[],
    *      String authType)
    */
-  public void checkServerTrusted(X509Certificate[] certificates,
-      String authType) throws CertificateException {
+  @Override
+  public void checkServerTrusted(X509Certificate[] certificates, String authType) throws CertificateException {
     if ((certificates != null) && (certificates.length == 1)) {
       certificates[0].checkValidity();
     } else {
@@ -66,7 +65,9 @@ public class SimpleX509TrustManager implements X509TrustManager {
   /**
    * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
    */
+  @Override
   public X509Certificate[] getAcceptedIssuers() {
     return this.standardTrustManager.getAcceptedIssuers();
   }
+  
 }

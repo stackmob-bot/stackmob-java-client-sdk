@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.tests;
+package com.stackmob.sdk;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,39 +32,40 @@ import org.junit.Ignore;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.stackmob.java.sdk.api.*;
-import com.stackmob.java.sdk.callback.StackMobCallback;
-import com.stackmob.java.sdk.exception.StackMobException;
+import com.stackmob.sdk.api.*;
+import com.stackmob.sdk.callback.StackMobCallback;
+import com.stackmob.sdk.exception.StackMobException;
 
 public class StackMobTest {
-    public static class Game {
-        private List<String> players;
-        private String gameId;
-        private long createdDate;
-        private long lastModDate;
-        private String name;
 
-        public Game(List<String> players, String gameId, long createdDate, long lastModDate, String name) {
-            this.players = players;
-            this.gameId = gameId;
-            this.createdDate = createdDate;
-            this.lastModDate = lastModDate;
-            this.name = name;
-        }
+  public static class Game {
 
-        public List<String> getPlayers() { return this.players; }
-        public String getGameId() { return this.gameId; }
-        public long getCreatedDate() { return this.createdDate; }
-        public long getLastModDate() { return this.lastModDate; }
+    private List<String> players;
+    private String gameId;
+    private long createdDate;
+    private long lastModDate;
+    private String name;
+
+    public Game(List<String> players, String gameId, long createdDate, long lastModDate, String name) {
+      this.players = players;
+      this.gameId = gameId;
+      this.createdDate = createdDate;
+      this.lastModDate = lastModDate;
+      this.name = name;
     }
 
+    public List<String> getPlayers() { return this.players; }
+    public String getGameId() { return this.gameId; }
+    public long getCreatedDate() { return this.createdDate; }
+    public long getLastModDate() { return this.lastModDate; }
+  }
 
   @BeforeClass
   public static void onlyOnce() {
     StackMob stackmob = StackMob.getInstance();
     stackmob.setApplication("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0",
-        "81573b21-b948-4339-baa3-dbffe0ca4503", "androidtest",
-        "stackmob", "stackmob.com", "user", 0);
+      "81573b21-b948-4339-baa3-dbffe0ca4503", "androidtest",
+      "stackmob", "stackmob.com", "user", 0);
   }
 
   @Test
@@ -79,11 +80,11 @@ public class StackMobTest {
     params.put("password", "1234");
 
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         assertNotNull(responseBody);
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -99,11 +100,11 @@ public class StackMobTest {
     params.put("password", "ghost");
 
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         fail("Login shouldn't succeed when login credentials are wrong");
       }
-
+      @Override
       public void failure(StackMobException e) {
         assertEquals("Unauthorized", e.getMessage());
       }
@@ -114,26 +115,26 @@ public class StackMobTest {
 
   @Test
   public void testLogoutShouldBeSucessful() {
-
     HashMap<String, Object> params = new HashMap<String, Object>();
     params.put("username", "admin");
     params.put("password", "1234");
-    StackMob.getInstance().login(params, new StackMobCallback() {
 
+    StackMob.getInstance().login(params, new StackMobCallback() {
+      @Override
       public void success(String responseBody) {
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
     });
 
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         assertNotNull(responseBody);
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -145,15 +146,14 @@ public class StackMobTest {
   @Test
   public void startSessionTest() {
     StackMob.getInstance().startSession(new StackMobCallback() {
-        @Override
-        public void success(String responseBody) {
-            assertNotNull(responseBody);
-        }
-
-        @Override
-        public void failure(StackMobException e) {
-            fail(e.getMessage());
-        }
+      @Override
+      public void success(String responseBody) {
+        assertNotNull(responseBody);
+      }
+      @Override
+      public void failure(StackMobException e) {
+        fail(e.getMessage());
+      }
     });
   }
 
@@ -161,12 +161,12 @@ public class StackMobTest {
   @Ignore("endsession is currently returning 404")
   public void endSessionTest() {
     StackMob.getInstance().endSession(new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         System.out.println("endsession: " + responseBody);
         assertNotNull(responseBody);
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -176,19 +176,16 @@ public class StackMobTest {
   @Test
   public void testGetWithoutArguments() {
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         assertNotNull(responseBody);
-
         Gson gson = new Gson();
-        Type collectionType = new TypeToken<List<Game>>() {
-        }.getType();
+        Type collectionType = new TypeToken<List<Game>>() {}.getType();
         List<Game> games = gson.fromJson(responseBody, collectionType);
-
         assertNotNull(games);
         assertFalse(games.isEmpty());
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -200,23 +197,18 @@ public class StackMobTest {
   @Test
   public void testGetWithArguments() {
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         assertNotNull(responseBody);
-
         Gson gson = new Gson();
-        Type collectionType = new TypeToken<List<Game>>() {
-        }.getType();
+        Type collectionType = new TypeToken<List<Game>>() {}.getType();
         List<Game> games = gson.fromJson(responseBody, collectionType);
-
         assertNotNull(games);
         assertFalse(games.size() > 1);
-
         Game game = games.get(0);
         assertEquals("one", game.name);
-
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -230,14 +222,13 @@ public class StackMobTest {
   @Test
   public void testPostWithRequestObject() {
     StackMobCallback callback = new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         Gson gson = new Gson();
         Game game = gson.fromJson(responseBody, Game.class);
-
         assertEquals("newGame", game.name);
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -253,21 +244,22 @@ public class StackMobTest {
     Game game = new Game(new ArrayList<String>(), "gameToDelete", 12345, 12345, "game to delete");
 
     StackMob.getInstance().post("game", game, new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         Gson gson = new Gson();
         Game game = gson.fromJson(responseBody, Game.class);
-
         StackMob.getInstance().delete("game", game.getGameId(), new StackMobCallback() {
-            public void success(String responseBody) {
-                assertNotNull(responseBody);
-            }
-            public void failure(StackMobException e) {
-                fail(e.getMessage());
-            }
+          @Override
+          public void success(String responseBody) {
+            assertNotNull(responseBody);
+          }
+          @Override
+          public void failure(StackMobException e) {
+            fail(e.getMessage());
+          }
         });
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
@@ -279,30 +271,30 @@ public class StackMobTest {
     Game game = new Game(new ArrayList<String>(), "gameToModifyName", 12345, 12345, "game to modify name");
 
     StackMob.getInstance().post("game", game, new StackMobCallback() {
-
+      @Override
       public void success(String responseBody) {
         Gson gson = new Gson();
         Game game = gson.fromJson(responseBody, Game.class);
-
         Game gameWithOtherName = new Game(new ArrayList<String>(), "otherName", 12345, 12345, "other named game");
-
         StackMob.getInstance().put("game", game.getGameId(), gameWithOtherName, new StackMobCallback() {
-            public void success(String responseBody) {
-                Gson gson = new Gson();
-                Game game = gson.fromJson(responseBody, Game.class);
-                assertNotNull(game);
-                assertEquals("otherName", game.name);
-            }
-
-            public void failure(StackMobException e) {
-                fail(e.getMessage());
-            }
+          @Override
+          public void success(String responseBody) {
+            Gson gson = new Gson();
+            Game game = gson.fromJson(responseBody, Game.class);
+            assertNotNull(game);
+            assertEquals("otherName", game.name);
+          }
+          @Override
+          public void failure(StackMobException e) {
+            fail(e.getMessage());
+          }
         });
       }
-
+      @Override
       public void failure(StackMobException e) {
         fail(e.getMessage());
       }
     });
   }
+  
 }

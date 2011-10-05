@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.api;
+package com.stackmob.sdk.api;
 
 public class StackMobSession {
 
@@ -31,9 +31,8 @@ public class StackMobSession {
 
   private String facebookAppId;
 
-  public StackMobSession(String key, String secret, String appName,
-      String subDomain, String domain, String userObjectName,
-      int apiVersionNumber) {
+  public StackMobSession(String key, String secret, String appName, String subDomain,
+                         String domain, String userObjectName, int apiVersionNumber) {
 
     this.key = key;
     this.secret = secret;
@@ -123,6 +122,5 @@ public class StackMobSession {
   public String getFacebookAppId() {
     return facebookAppId;
   }
-
 
 }

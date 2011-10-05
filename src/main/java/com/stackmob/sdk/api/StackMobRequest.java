@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.api;
+package com.stackmob.sdk.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -33,12 +33,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import com.google.gson.Gson;
-import com.stackmob.java.sdk.callback.StackMobCallback;
-import com.stackmob.java.sdk.exception.StackMobException;
-import com.stackmob.java.sdk.net.HttpHelper;
-import com.stackmob.java.sdk.net.HttpVerb;
+import com.stackmob.sdk.callback.StackMobCallback;
+import com.stackmob.sdk.exception.StackMobException;
+import com.stackmob.sdk.net.HttpHelper;
+import com.stackmob.sdk.net.HttpVerb;
 
 public class StackMobRequest {
+
   private static final String URL_FMT = "api.mob1.stackmob.com";
   private static final String SECURE_SCHEME = "https";
   private static final String REGULAR_SCHEME = "http";
@@ -48,6 +49,7 @@ public class StackMobRequest {
   public boolean isUserBased = false;
   public Boolean isSecure = true;
   public HttpVerb httpMethod = HttpVerb.GET;
+
   //default to doing nothing
   public StackMobCallback callback = new StackMobCallback() {
 	  @Override
@@ -55,6 +57,7 @@ public class StackMobRequest {
 	  @Override
 	  public void failure(StackMobException e) {}
   };
+
   public HashMap<String, Object> params;
   public Object requestObject;
 
@@ -67,24 +70,22 @@ public class StackMobRequest {
     try {
       String response = null;
 
-      switch(this.httpMethod) {
+      switch(httpMethod) {
+        case GET:
+          response = sendGetRequest();
+          break;
 
-      case GET:
-        response = sendGetRequest();
-        break;
-        
-      case POST:
-        response = sendPostRequest();
-        break;
+        case POST:
+          response = sendPostRequest();
+          break;
 
-      case PUT:
-        response = sendPutRequest();
-        break;
+        case PUT:
+          response = sendPutRequest();
+          break;
 
-      case DELETE:
-        response = sendDeleteRequest();
-        break;
-
+        case DELETE:
+          response = sendDeleteRequest();
+          break;
       }
 
       callback.success(response);
@@ -96,19 +97,16 @@ public class StackMobRequest {
   }
 
   private String sendGetRequest() throws StackMobException {
-
     URI uri;
     String ret;
 
     try {
       String query = null;
-      if (null != this.params) {
-        query = URLEncodedUtils.format(getParamsForRequest(),
-            HTTP.UTF_8);
+      if (null != params) {
+        query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
       }
 
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),
-          query, null);
+      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
       ret = HttpHelper.doGet(uri);
 
     } catch (URISyntaxException e) {
@@ -116,7 +114,6 @@ public class StackMobRequest {
     }
 
     return ret;
-
   }
 
   private String sendPostRequest() throws StackMobException {
@@ -124,18 +121,14 @@ public class StackMobRequest {
     String ret;
 
     try {
-
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),
-          null, null);
+      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
 
       HttpEntity entity = null;
-      if (null != this.params) {
-        entity = new UrlEncodedFormEntity(getParamsForRequest(),
-            HTTP.UTF_8);
-      } else if (null != this.requestObject) {
+      if (null != params) {
+        entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
+      } else if (null != requestObject) {
         Gson gson = new Gson();
-        entity = new StringEntity(gson.toJson(this.requestObject),
-            HTTP.UTF_8);
+        entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
       }
 
       ret = HttpHelper.doPost(uri, entity);
@@ -154,18 +147,14 @@ public class StackMobRequest {
     String ret;
 
     try {
-
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),
-          null, null);
+      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
 
       HttpEntity entity = null;
-      if (null != this.params) {
-        entity = new UrlEncodedFormEntity(getParamsForRequest(),
-            HTTP.UTF_8);
-      } else if (null != this.requestObject) {
+      if (null != params) {
+        entity = new UrlEncodedFormEntity(getParamsForRequest(),HTTP.UTF_8);
+      } else if (null != requestObject) {
         Gson gson = new Gson();
-        entity = new StringEntity(gson.toJson(this.requestObject),
-            HTTP.UTF_8);
+        entity = new StringEntity(gson.toJson(requestObject),HTTP.UTF_8);
       }
 
       ret = HttpHelper.doPut(uri, entity);
@@ -185,13 +174,11 @@ public class StackMobRequest {
 
     try {
       String query = null;
-      if (null != this.params) {
-        query = URLEncodedUtils.format(getParamsForRequest(),
-            HTTP.UTF_8);
+      if (null != params) {
+        query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
       }
 
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),
-          query, null);
+      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
       ret = HttpHelper.doDelete(uri);
 
     } catch (URISyntaxException e) {
@@ -202,17 +189,15 @@ public class StackMobRequest {
   }
 
   private String getPath() {
-    if (this.isUserBased) {
-      return "/" + this.session.getUserObjectName() + "/"
-          + this.methodName;
+    if (isUserBased) {
+      return "/" + session.getUserObjectName() + "/" + methodName;
     } else {
-      return "/" + this.methodName;
+      return "/" + methodName;
     }
-
   }
 
   private String getScheme() {
-    if (this.isSecure) {
+    if (isSecure) {
       return SECURE_SCHEME;
     } else {
       return REGULAR_SCHEME;
@@ -224,16 +209,13 @@ public class StackMobRequest {
   }
 
   private List<NameValuePair> getParamsForRequest() {
-
-    if (null == this.params) {
+    if (null == params) {
       return null;
     }
 
-    List<NameValuePair> ret = new ArrayList<NameValuePair>(
-        this.params.size());
-    for (String key : this.params.keySet()) {
-      ret.add(new BasicNameValuePair(key, this.params.get(key)
-          .toString()));
+    List<NameValuePair> ret = new ArrayList<NameValuePair>(params.size());
+    for (String key : params.keySet()) {
+      ret.add(new BasicNameValuePair(key, params.get(key).toString()));
     }
 
     return ret;

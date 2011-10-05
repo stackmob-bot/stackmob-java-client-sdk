@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.tests;
+package com.stackmob.sdk;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
-import com.stackmob.java.sdk.api.*;
+import com.stackmob.sdk.api.*;
 
 public class StackMobSessionTest {
 
@@ -29,14 +28,13 @@ public class StackMobSessionTest {
   public static void onlyOnce() {
     StackMob stackmob = StackMob.getInstance();
     stackmob.setApplication("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0",
-        "81573b21-b948-4339-baa3-dbffe0ca4503", "androidtest",
-        "fithsaring.mob1", "stackmob.com", "user", 0);
+      "81573b21-b948-4339-baa3-dbffe0ca4503", "androidtest",
+      "fithsaring.mob1", "stackmob.com", "user", 0);
   }
 
   @Test
   public void testSessionInitializedCorrectly() {
     StackMobSession session = StackMob.getInstance().getSession();
-
     assertEquals("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", session.getKey());
     assertEquals("81573b21-b948-4339-baa3-dbffe0ca4503", session.getSecret());
     assertEquals("androidtest", session.getAppName());

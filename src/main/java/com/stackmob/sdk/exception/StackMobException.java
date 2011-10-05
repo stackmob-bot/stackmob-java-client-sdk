@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.callback;
+package com.stackmob.sdk.exception;
 
-import com.stackmob.java.sdk.exception.StackMobException;
+public class StackMobException extends Exception {
 
-public interface StackMobCallback {
+  private static final long serialVersionUID = 1L;
 
-  void success(String responseBody);
-
-  void failure(StackMobException e);
+  public StackMobException(String message) {
+    super(message);
+  }
 
 }

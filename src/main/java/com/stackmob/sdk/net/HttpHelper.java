@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackmob.java.sdk.net;
+package com.stackmob.sdk.net;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,8 +46,8 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
-import com.stackmob.java.sdk.api.StackMob;
-import com.stackmob.java.sdk.exception.StackMobException;
+import com.stackmob.sdk.api.StackMob;
+import com.stackmob.sdk.exception.StackMobException;
 
 public class HttpHelper {
 
@@ -66,7 +66,6 @@ public class HttpHelper {
   }
 
   public static String doGet(URI uri) throws StackMobException {
-
     maybeCreateHttpClient();
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
@@ -74,13 +73,9 @@ public class HttpHelper {
     request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
     request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
 
-    String ret = null;
-
     try {
-
       mConsumer.sign(request);
-      ret = mHttpClient.execute(request, responseHandler);
-
+      return mHttpClient.execute(request, responseHandler);
     } catch (OAuthMessageSignerException e) {
       throw new StackMobException(e.getMessage());
     } catch (OAuthExpectationFailedException e) {
@@ -92,13 +87,9 @@ public class HttpHelper {
     } catch (IOException e) {
       throw new StackMobException(e.getMessage());
     }
-
-    return ret;
   }
 
-  public static String doPost(URI uri, HttpEntity entity)
-      throws StackMobException {
-
+  public static String doPost(URI uri, HttpEntity entity) throws StackMobException {
     maybeCreateHttpClient();
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
@@ -111,11 +102,9 @@ public class HttpHelper {
     request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
     request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
 
-    String ret = null;
-
     try {
       mConsumer.sign(request);
-      ret = mHttpClient.execute(request, responseHandler);
+      return mHttpClient.execute(request, responseHandler);
     } catch (OAuthMessageSignerException e) {
       throw new StackMobException(e.getMessage());
     } catch (OAuthExpectationFailedException e) {
@@ -127,8 +116,6 @@ public class HttpHelper {
     } catch (IOException e) {
       throw new StackMobException(e.getMessage());
     }
-
-    return ret;
   }
 
   public static String doPut(URI uri, HttpEntity entity) throws StackMobException {
@@ -144,11 +131,9 @@ public class HttpHelper {
     request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
     request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
 
-    String ret = null;
-
     try {
       mConsumer.sign(request);
-      ret = mHttpClient.execute(request, responseHandler);
+      return mHttpClient.execute(request, responseHandler);
     } catch (OAuthMessageSignerException e) {
       throw new StackMobException(e.getMessage());
     } catch (OAuthExpectationFailedException e) {
@@ -160,8 +145,6 @@ public class HttpHelper {
     } catch (IOException e) {
       throw new StackMobException(e.getMessage());
     }
-
-    return ret;
   }
 
   public static String doDelete(URI uri) throws StackMobException {
@@ -172,13 +155,9 @@ public class HttpHelper {
     request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
     request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
 
-    String ret = null;
-
     try {
-
       mConsumer.sign(request);
-      ret = mHttpClient.execute(request, responseHandler);
-
+      return mHttpClient.execute(request, responseHandler);
     } catch (OAuthMessageSignerException e) {
       throw new StackMobException(e.getMessage());
     } catch (OAuthExpectationFailedException e) {
@@ -190,37 +169,30 @@ public class HttpHelper {
     } catch (IOException e) {
       throw new StackMobException(e.getMessage());
     }
-
-    return ret;
   }
 
   private static DefaultHttpClient setupHttpClient() {
     HttpParams httpParams = new BasicHttpParams();
     setConnectionParams(httpParams);
     SchemeRegistry schemeRegistry = registerFactories();
-    ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(
-        httpParams, schemeRegistry);
+    ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
 
-    DefaultHttpClient client = new DefaultHttpClient(
-        clientConnectionManager, httpParams);
+    DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
     client.setRedirectHandler(new FollowPostRedirectHandler());
 
     StackMob stackmob = StackMob.getInstance();
-    mConsumer = new CommonsHttpOAuthConsumer(stackmob.getSession()
-        .getKey(), stackmob.getSession().getSecret());
+    mConsumer = new CommonsHttpOAuthConsumer(stackmob.getSession().getKey(), stackmob.getSession().getSecret());
 
     return client;
   }
   public static void setVersion(int version) {
-      DEFAULT_CONTENT_TYPE = String.format(DEFAULT_CONTENT_TYPE_FMT, version);
+    DEFAULT_CONTENT_TYPE = String.format(DEFAULT_CONTENT_TYPE_FMT, version);
   }
 
   private static SchemeRegistry registerFactories() {
     SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("http", PlainSocketFactory
-        .getSocketFactory(), 80));
-    schemeRegistry.register(new Scheme("https",
-        new SimpleSSLSocketFactory(), 443));
+    schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+    schemeRegistry.register(new Scheme("https", new SimpleSSLSocketFactory(), 443));
     return schemeRegistry;
   }
 
@@ -230,4 +202,5 @@ public class HttpHelper {
     HttpConnectionParams.setConnectionTimeout(httpParams, CONN_TIMEOUT);
     HttpConnectionParams.setSoTimeout(httpParams, CONN_TIMEOUT);
   }
+
 }
