@@ -22,8 +22,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URIUtils;
@@ -40,33 +43,58 @@ import com.stackmob.sdk.net.HttpVerb;
 
 public class StackMobRequest {
 
-    private static final String URL_FMT = "api.mob1.stackmob.com";
-    private static final String SECURE_SCHEME = "https";
-    private static final String REGULAR_SCHEME = "http";
+    public static final String DEFAULT_URL_BASE = "api.mob1.stackmob.com";
+    protected static final String SECURE_SCHEME = "https";
+    protected static final String REGULAR_SCHEME = "http";
 
-    private StackMobSession session;
-    private String sessionKey;
-    private String sessionSecret;
-    public String methodName;
-    public boolean isUserBased = false;
-    public Boolean isSecure = true;
-    public HttpVerb httpMethod = HttpVerb.GET;
+    protected StackMobSession session;
+    protected String sessionKey;
+    protected String sessionSecret;
+    protected String methodName;
+
+    protected String url_fmt = DEFAULT_URL_BASE;
+
+    protected Boolean isSecure = true;
+    protected HttpVerb httpMethod = HttpVerb.GET;
+
+    protected Map<String, Object> params;
+    protected Object requestObject;
 
     //default to doing nothing
-    public StackMobCallback callback = new StackMobCallback() {
+    protected StackMobCallback callback = new StackMobCallback() {
         @Override
         public void success(String s) {}
         @Override
         public void failure(StackMobException e) {}
     };
 
-    public HashMap<String, Object> params;
-    public Object requestObject;
+    //default constructor - not available for public consumption
+    private StackMobRequest(StackMobSession session, String method) {
+        this.session = session;
+        this.sessionKey = session.getKey();
+        this.sessionSecret = session.getSecret();
+        this.methodName = method;
+    }
 
-    public StackMobRequest(StackMobSession session) {
-      this.session = session;
-      this.sessionKey = session.getKey();
-      this.sessionSecret = session.getSecret();
+    public StackMobRequest(StackMobSession session, String method, StackMobCallback callback) {
+        this(session, method);
+        this.callback = callback;
+    }
+
+    public StackMobRequest(StackMobSession session, String method, Map<String, Object> args, StackMobCallback callback) {
+        this(session, method, callback);
+        this.params = args;
+    }
+
+    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, Object requestObject, StackMobCallback callback) {
+        this(session, method, verb, callback);
+        this.requestObject = requestObject;
+    }
+
+    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, StackMobCallback callback) {
+        this(session, method, callback);
+        this.methodName = method;
+        this.httpMethod = verb;
     }
 
     public void sendRequest() {
@@ -195,13 +223,8 @@ public class StackMobRequest {
         return ret;
     }
 
-    private String getPath() {
-        if (isUserBased) {
-            return "/" + session.getUserObjectName() + "/" + methodName;
-        }
-        else {
-            return "/" + methodName;
-        }
+    protected String getPath() {
+        return "/" + methodName;
     }
 
     private String getScheme() {
@@ -214,7 +237,7 @@ public class StackMobRequest {
     }
 
     private String getHost() {
-        return URL_FMT;
+        return url_fmt;
     }
 
     private List<NameValuePair> getParamsForRequest() {

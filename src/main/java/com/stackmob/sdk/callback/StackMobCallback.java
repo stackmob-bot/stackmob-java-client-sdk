@@ -20,8 +20,7 @@ import com.stackmob.sdk.exception.StackMobException;
 
 public interface StackMobCallback {
 
-  void success(String responseBody);
+    void success(String responseBody);
 
-  void failure(StackMobException e);
-
+    void failure(StackMobException e);
 }

@@ -18,6 +18,8 @@ package com.stackmob.sdk;
 
 import com.stackmob.sdk.api.StackMob;
 import com.stackmob.sdk.api.StackMobRequest;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -36,13 +38,7 @@ public class StackMobRequestTest {
 
     @Test
     public void testListapiSecureGetRequest() {
-        StackMobRequest request = new StackMobRequest(stackmob.getSession());
-
-        request.methodName = "listapi";
-        request.isSecure = true;
-        request.isUserBased = false;
-        request.httpMethod = HttpVerb.GET;
-        request.callback = new StackMobCallback() {
+        StackMobRequest request = new StackMobRequest(stackmob.getSession(), "lisapi", new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotNull(responseBody);
@@ -51,20 +47,14 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        };
+        });
 
         request.sendRequest();
     }
 
     @Test
     public void testListapiSecurePostRequest() {
-        StackMobRequest request = new StackMobRequest(stackmob.getSession());
-
-        request.methodName = "listapi";
-        request.isSecure = true;
-        request.isUserBased = false;
-        request.httpMethod = HttpVerb.POST;
-        request.callback = new StackMobCallback() {
+        StackMobRequest request = new StackMobRequest(stackmob.getSession(), "listapi", HttpVerb.POST, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotNull(responseBody);
@@ -73,20 +63,14 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        };
+        });
 
         request.sendRequest();
     }
 
     @Test
     public void testListapiRegularGetRequest() {
-        StackMobRequest request = new StackMobRequest(stackmob.getSession());
-
-        request.methodName = "listapi";
-        request.isSecure = false;
-        request.isUserBased = false;
-        request.httpMethod = HttpVerb.GET;
-        request.callback = new StackMobCallback() {
+        StackMobRequest request = new StackMobRequest(stackmob.getSession(), "listapi", new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotNull(responseBody);
@@ -95,20 +79,14 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        };
+        });
 
         request.sendRequest();
     }
 
     @Test
     public void testListapiRegularPostRequest() {
-        StackMobRequest request = new StackMobRequest(stackmob.getSession());
-
-        request.methodName = "listapi";
-        request.isSecure = false;
-        request.isUserBased = false;
-        request.httpMethod = HttpVerb.POST;
-        request.callback = new StackMobCallback() {
+        StackMobRequest request = new StackMobRequest(stackmob.getSession(), "listapi", HttpVerb.POST, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotNull(responseBody);
@@ -117,20 +95,14 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        };
+        });
 
         request.sendRequest();
     }
 
     @Test
     public void testInexistentMethodShouldFail() {
-        StackMobRequest request = new StackMobRequest(stackmob.getSession());
-
-        request.methodName = "inexistent";
-        request.isSecure = true;
-        request.isUserBased = false;
-        request.httpMethod = HttpVerb.GET;
-        request.callback = new StackMobCallback() {
+        StackMobRequest request = new StackMobRequest(stackmob.getSession(), "inexistent", new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 fail("Inexistent method should fail");
@@ -139,7 +111,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 assertNotNull(e.getMessage());
             }
-        };
+        });
 
         request.sendRequest();
     }

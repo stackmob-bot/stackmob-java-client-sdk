@@ -47,19 +47,6 @@ public class StackMob {
         setSession(new StackMobSession(apiKey, apiSecret, appName, subDomain, domain, userObjectName, apiVersionNumber));
     }
 
-    public void setApplication(String apiKey, String apiSecret,
-        String appName, String subDomain, String domain,
-        String userObjectName, Integer apiVersionNumber) {
-
-        setSession(new StackMobSession(apiKey,
-                apiSecret,
-                appName,
-                subDomain,
-                domain,
-                userObjectName,
-                apiVersionNumber));
-    }
-
     public void setTwitterConsumer(String consumerKey, String consumerSecret) {
         session.setTwitterConsumerKey(consumerKey);
         session.setTwitterConsumerSecret(consumerSecret);
@@ -70,173 +57,77 @@ public class StackMob {
     }
 
     public void login(HashMap<String, Object> params, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "login";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-        request.params = params;
-
-        request.sendRequest();
+        new StackMobUserBasedRequest(session, "login", params, callback).sendRequest();
     }
 
     public void logout(StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "logout";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "logout", callback).sendRequest();
     }
 
     public void startSession(StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "startsession";
-        request.httpMethod = HttpVerb.POST;
-        request.isSecure = true;
-        request.callback = callback;
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        request.requestObject = params;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, "startsession", HttpVerb.POST, callback).sendRequest();
     }
 
     public void endSession(StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "endsession";
-        request.httpMethod = HttpVerb.POST;
-        request.isSecure = true;
-        request.callback = callback;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, "endsession", HttpVerb.POST, callback).sendRequest();
     }
 
     public void twitterLogin(String token, String secret, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "twitterLogin";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
-        request.params = params;
-
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "twitterlogin", params, callback).sendRequest();
     }
 
     public void twitterStatusUpdate(String message, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "twitterStatusUpdate";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("tw_st", message);
-        request.params = params;
-
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "twitterStatusUpdate", params, callback).sendRequest();
     }
 
     public void registerWithTwitterToken(String token, String secret, String username, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "createUserWithTwitter";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
         params.put("username", username);
-        request.params = params;
-
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "createUserWithTwitter", params, callback).sendRequest();
     }
 
     public void linkUserWithTwitterToken(String token, String secret, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "linkUserWithTwitter";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
-        request.params = params;
 
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "linkUserWithTwitter", params, callback).sendRequest();
     }
 
     public void facebookLogin(String token, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "facebookLogin";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("fb_at", token);
-        request.params = params;
 
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "facebookLogin", params, callback).sendRequest();
     }
 
     public void registerWithFacebookToken(String token, String username, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "createUserWithFacebook";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("fb_at", token);
         params.put("username", username);
-        request.params = params;
 
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "createUserWithFacebook", params, callback).sendRequest();
     }
 
     public void linkUserWithFacebookToken(String token, String secret, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "linkUserWithFacebook";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("fb_at", token);
-        request.params = params;
 
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "linkUserWithFacebook", params, callback).sendRequest();
     }
 
     public void facebookPostMessage(String msg, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = "postFacebookMessage";
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = true;
-        request.isSecure = true;
-        request.callback = callback;
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("message", msg);
-        request.params = params;
 
-        request.sendRequest();
+        new StackMobUserBasedRequest(this.session, "postFacebookMessage", params, callback).sendRequest();
     }
 
     public void getFacebookUserInfo(StackMobCallback callback) {
@@ -249,57 +140,26 @@ public class StackMob {
     }
 
     public void get(String path, StackMobCallback callback) {
-        get(path, null, callback);
+        new StackMobRequest(this.session, path, callback).sendRequest();
     }
 
     public void get(String path, HashMap<String, Object> arguments, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = path;
-        request.httpMethod = HttpVerb.GET;
-        request.isUserBased = false;
-        request.isSecure = true;
-        request.callback = callback;
-        request.params = arguments;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, path, arguments, callback).sendRequest();
     }
 
     public void post(String path, Object requestObject, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = path;
-        request.httpMethod = HttpVerb.POST;
-        request.isUserBased = false;
-        request.isSecure = true;
-        request.callback = callback;
-        request.requestObject = requestObject;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, path, HttpVerb.POST, requestObject, callback).sendRequest();
     }
 
     public void put(String path, String id, Object requestObject, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = path + "/" + id;
-        request.httpMethod = HttpVerb.PUT;
-        request.isUserBased = false;
-        request.isSecure = true;
-        request.callback = callback;
-        request.requestObject = requestObject;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, path + "/" + id, HttpVerb.PUT, requestObject, callback).sendRequest();
     }
 
     public void delete(String path, String id, StackMobCallback callback) {
-        StackMobRequest request = new StackMobRequest(this.session);
-        request.methodName = path + "/" + id;
-        request.httpMethod = HttpVerb.DELETE;
-        request.isUserBased = false;
-        request.isSecure = true;
-        request.callback = callback;
-
-        request.sendRequest();
+        new StackMobRequest(this.session, path + "/" + id, HttpVerb.DELETE, callback).sendRequest();
     }
 
-    public void setSession(StackMobSession session) {
+    private void setSession(StackMobSession session) {
         this.session = session;
         HttpHelper.setVersion(this.session.getApiVersionNumber());
     }

@@ -60,10 +60,7 @@ public class StackMobTest {
             this.name = name;
         }
 
-        public List<String> getPlayers() { return this.players; }
         public String getGameId() { return this.gameId; }
-        public long getCreatedDate() { return this.createdDate; }
-        public long getLastModDate() { return this.lastModDate; }
     }
 
     @Test
@@ -80,11 +77,11 @@ public class StackMobTest {
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-            assertNotNull(responseBody);
+                assertNotNull(responseBody);
             }
             @Override
             public void failure(StackMobException e) {
-            fail(e.getMessage());
+                fail(e.getMessage());
             }
         };
 
@@ -119,7 +116,9 @@ public class StackMobTest {
 
         stackmob.login(params, new StackMobCallback() {
             @Override
-            public void success(String responseBody) {}
+            public void success(String responseBody) {
+            }
+
             @Override
             public void failure(StackMobException e) {
                 fail(e.getMessage());
@@ -147,6 +146,7 @@ public class StackMobTest {
             public void success(String responseBody) {
                 assertNotNull(responseBody);
             }
+
             @Override
             public void failure(StackMobException e) {
                 fail(e.getMessage());
@@ -250,12 +250,14 @@ public class StackMobTest {
                     public void success(String responseBody) {
                         assertNotNull(responseBody);
                     }
+
                     @Override
                     public void failure(StackMobException e) {
                         fail(e.getMessage());
                     }
                 });
             }
+
             @Override
             public void failure(StackMobException e) {
                 fail(e.getMessage());
@@ -285,7 +287,7 @@ public class StackMobTest {
                     public void failure(StackMobException e) {
                         fail(e.getMessage());
                     }
-                 });
+                });
             }
             @Override
             public void failure(StackMobException e) {
