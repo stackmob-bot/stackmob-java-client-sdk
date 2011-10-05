@@ -45,22 +45,25 @@ public class StackMobTest {
 
     public static class Game {
 
-        private List<String> players;
-        private String gameId;
-        private long createdDate;
-        private long lastModDate;
-        private String name;
+        //public for the benefit of Gson
+        public List<String> players;
+        public String game_id;
+        public long createdDate;
+        public long lastModDate;
+        public String name;
 
-
+        //for Gson deserialization
         public Game(List<String> players, String gameId, long createdDate, long lastModDate, String name) {
-            this.players = players;
-            this.gameId = gameId;
-            this.createdDate = createdDate;
-            this.lastModDate = lastModDate;
-            this.name = name;
+          this(players, name);
+          this.game_id = gameId;
+          this.createdDate = createdDate;
+          this.lastModDate = lastModDate;
         }
 
-        public String getGameId() { return this.gameId; }
+        public Game(List<String> players, String name) {
+            this.players = players;
+            this.name = name;
+        }
     }
 
     @Test
@@ -231,21 +234,21 @@ public class StackMobTest {
             }
         };
 
-        Game game = new Game(new ArrayList<String>(), "newGame", 12345, 12345, "new game");
+        Game game = new Game(new ArrayList<String>(), "newGame");
         game.name = "newGame";
         stackmob.post("game", game, callback);
     }
 
     @Test
     public void testDeleteWithId() {
-        Game game = new Game(new ArrayList<String>(), "gameToDelete", 12345, 12345, "game to delete");
+        Game game = new Game(new ArrayList<String>(), "gameToDelete");
 
         stackmob.post("game", game, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 Gson gson = new Gson();
                 Game game = gson.fromJson(responseBody, Game.class);
-                stackmob.delete("game", game.getGameId(), new StackMobCallback() {
+                stackmob.delete("game", game.game_id, new StackMobCallback() {
                     @Override
                     public void success(String responseBody) {
                         assertNotNull(responseBody);
@@ -267,21 +270,23 @@ public class StackMobTest {
 
     @Test
     public void testPutWithIdAndObjectRequest() {
-        Game game = new Game(new ArrayList<String>(), "gameToModifyName", 12345, 12345, "game to modify name");
+        final String oldName = "oldGameName";
+        final String newName = "newGameName";
+        Game game = new Game(new ArrayList<String>(), oldName);
 
         stackmob.post("game", game, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 Gson gson = new Gson();
                 Game game = gson.fromJson(responseBody, Game.class);
-                Game gameWithOtherName = new Game(new ArrayList<String>(), "otherName", 12345, 12345, "other named game");
-                stackmob.put("game", game.getGameId(), gameWithOtherName, new StackMobCallback() {
+                game.name = newName;
+                stackmob.put("game", game.game_id, game, new StackMobCallback() {
                     @Override
                     public void success(String responseBody) {
                         Gson gson = new Gson();
                         Game game = gson.fromJson(responseBody, Game.class);
                         assertNotNull(game);
-                        assertEquals("otherName", game.name);
+                        assertEquals(newName, game.name);
                     }
                     @Override
                     public void failure(StackMobException e) {
