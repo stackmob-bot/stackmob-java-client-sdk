@@ -101,7 +101,6 @@
     <url>https://github.com/stackmob/stackmob-java-sdk/issues</url>
   </issueManagement>
 
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
