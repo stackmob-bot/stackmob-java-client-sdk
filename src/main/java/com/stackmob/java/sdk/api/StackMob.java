@@ -36,10 +36,21 @@ public class StackMob {
 	  token.put("type", "android");
 	}
   }
- 
-  public static StackMob getInstance() {
-	return instance;
+
+  //helper - replaces a getInstance, setSession call
+  public static StackMob getInstance(String apiKey,
+                  String apiSecret,
+                  String appName,
+                  String subDomain,
+                  String domain,
+                  String userObjectName,
+                  Integer apiVersionNumber) {
+      instance.setSession(new StackMobSession(apiKey, apiSecret, appName, subDomain, domain, userObjectName, apiVersionNumber));
+      return instance;
   }
+
+  public static StackMob getInstance() { return instance; }
+
 
   private StackMob() {
   }
