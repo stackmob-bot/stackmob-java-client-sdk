@@ -19,6 +19,9 @@ package com.stackmob.sdk;
 import com.stackmob.sdk.api.StackMob;
 import com.stackmob.sdk.api.StackMobRequest;
 import com.stackmob.sdk.api.StackMobSession;
+import com.stackmob.sdk.callback.StackMobRedirectedCallback;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.junit.Test;
 import org.junit.Ignore;
 import static org.junit.Assert.*;
@@ -28,6 +31,13 @@ import com.stackmob.sdk.exception.StackMobException;
 import com.stackmob.sdk.net.HttpVerb;
 
 public class StackMobRequestTest {
+    private StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
+      @Override
+      public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {
+        //do nothing
+      }
+    };
+
     private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0",
             "81573b21-b948-4339-baa3-dbffe0ca4503",
             "androidtest",
@@ -49,7 +59,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        });
+        }, redirectedCallback);
 
         request.sendRequest();
     }
@@ -65,7 +75,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        });
+        }, redirectedCallback);
 
         request.sendRequest();
     }
@@ -81,7 +91,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        });
+        }, redirectedCallback);
 
         request.sendRequest();
     }
@@ -97,7 +107,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        });
+        }, redirectedCallback);
 
         request.sendRequest();
     }
@@ -113,7 +123,7 @@ public class StackMobRequestTest {
             public void failure(StackMobException e) {
                 assertNotNull(e.getMessage());
             }
-        });
+        }, redirectedCallback);
 
         request.sendRequest();
     }

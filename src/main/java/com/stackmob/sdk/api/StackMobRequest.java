@@ -20,13 +20,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URIUtils;
@@ -43,7 +41,7 @@ import com.stackmob.sdk.net.HttpVerb;
 
 public class StackMobRequest {
 
-    public static final String DEFAULT_URL_BASE = "api.mob1.stackmob.com";
+    public static final String DEFAULT_URL_FORMAT = "api.mob1.stackmob.com";
     protected static final String SECURE_SCHEME = "https";
     protected static final String REGULAR_SCHEME = "http";
 
@@ -52,7 +50,7 @@ public class StackMobRequest {
     protected String sessionSecret;
     protected String methodName;
 
-    protected String url_fmt = DEFAULT_URL_BASE;
+    protected String urlFormat = DEFAULT_URL_FORMAT;
 
     protected Boolean isSecure = true;
     protected HttpVerb httpMethod = HttpVerb.GET;
@@ -68,33 +66,41 @@ public class StackMobRequest {
         public void failure(StackMobException e) {}
     };
 
+    protected StackMobRedirectedCallback redirectedCallback;
+
     //default constructor - not available for public consumption
-    private StackMobRequest(StackMobSession session, String method) {
+    private StackMobRequest(StackMobSession session, String method, StackMobRedirectedCallback redirCB) {
         this.session = session;
         this.sessionKey = session.getKey();
         this.sessionSecret = session.getSecret();
         this.methodName = method;
+        this.redirectedCallback = redirCB;
     }
 
-    public StackMobRequest(StackMobSession session, String method, StackMobCallback callback) {
-        this(session, method);
+    public StackMobRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+        this(session, method, redirCB);
         this.callback = callback;
     }
 
-    public StackMobRequest(StackMobSession session, String method, Map<String, Object> args, StackMobCallback callback) {
-        this(session, method, callback);
+    public StackMobRequest(StackMobSession session, String method, Map<String, Object> args, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+        this(session, method, callback, redirCB);
         this.params = args;
     }
 
-    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, Object requestObject, StackMobCallback callback) {
-        this(session, method, verb, callback);
+    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, Object requestObject, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+        this(session, method, verb, callback, redirCB);
         this.requestObject = requestObject;
     }
 
-    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, StackMobCallback callback) {
-        this(session, method, callback);
+    public StackMobRequest(StackMobSession session, String method, HttpVerb verb, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+        this(session, method, callback, redirCB);
         this.methodName = method;
         this.httpMethod = verb;
+    }
+
+    public StackMobRequest setUrlFormat(String urlFmt) {
+        this.urlFormat = urlFmt;
+        return this;
     }
 
     public void sendRequest() {
@@ -123,7 +129,6 @@ public class StackMobRequest {
         catch (StackMobException e) {
             callback.failure(e);
         }
-
     }
 
     private String sendGetRequest() throws StackMobException {
@@ -137,7 +142,7 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret);
+            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, redirectedCallback);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -162,7 +167,7 @@ public class StackMobRequest {
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
-            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret);
+            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, redirectedCallback);
 
         }
         catch (URISyntaxException e) {
@@ -190,7 +195,7 @@ public class StackMobRequest {
                 entity = new StringEntity(gson.toJson(requestObject),HTTP.UTF_8);
             }
 
-            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret);
+            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, redirectedCallback);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -213,7 +218,7 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret);
+            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, redirectedCallback);
 
         }
         catch (URISyntaxException e) {
@@ -237,7 +242,7 @@ public class StackMobRequest {
     }
 
     private String getHost() {
-        return url_fmt;
+        return urlFormat;
     }
 
     private List<NameValuePair> getParamsForRequest() {

@@ -19,6 +19,7 @@ package com.stackmob.sdk.net;
 import java.io.IOException;
 import java.net.URI;
 
+import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
@@ -59,14 +60,14 @@ public class HttpHelper {
   private static DefaultHttpClient mHttpClient;
   private static OAuthConsumer mConsumer;
 
-  public static void maybeCreateHttpClient(String sessionKey, String sessionSecret) {
+  private static void maybeCreateHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
     if (mHttpClient == null) {
-      mHttpClient = setupHttpClient(sessionKey, sessionSecret);
+      mHttpClient = setupHttpClient(sessionKey, sessionSecret, redirCB);
     }
   }
 
-  public static String doGet(URI uri, String sessionKey, String sessionSecret) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret);
+  public static String doGet(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpGet request = new HttpGet(uri);
@@ -89,8 +90,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doPost(URI uri, HttpEntity entity, String sessionKey, String sessionSecret) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret);
+  public static String doPost(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpPost request = new HttpPost(uri);
@@ -118,8 +119,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret);
+  public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpPut request = new HttpPut(uri);
@@ -147,8 +148,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doDelete(URI uri, String sessionKey, String sessionSecret) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret);
+  public static String doDelete(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpDelete request = new HttpDelete(uri);
@@ -171,14 +172,14 @@ public class HttpHelper {
     }
   }
 
-  private static DefaultHttpClient setupHttpClient(String sessionKey, String sessionSecret) {
+  private static DefaultHttpClient setupHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
     HttpParams httpParams = new BasicHttpParams();
     setConnectionParams(httpParams);
     SchemeRegistry schemeRegistry = registerFactories();
     ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(schemeRegistry);
 
     DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
-    client.setRedirectStrategy(new HttpRedirectStrategy());
+    client.setRedirectStrategy(new HttpRedirectStrategy(redirCB));
 
     mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
 

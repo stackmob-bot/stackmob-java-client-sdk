@@ -16,10 +16,9 @@
 
 package com.stackmob.sdk.callback;
 
-import com.stackmob.sdk.exception.StackMobException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 
-public interface StackMobCallback {
-    void success(String responseBody);
-
-    void failure(StackMobException e);
+public interface RedirectedCallback {
+    public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest);
 }
