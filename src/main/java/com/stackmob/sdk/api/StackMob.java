@@ -25,7 +25,6 @@ import com.stackmob.sdk.net.HttpHelper;
 
 public class StackMob {
 
-  private static StackMob instance = new StackMob();
   private StackMobSession session;
 
   protected static class RegistrationIDAndUser {
@@ -39,21 +38,14 @@ public class StackMob {
 	  }
   }
 
-  //helper - replaces a getInstance, setSession call
-  public static StackMob getInstance(String apiKey,
-                                     String apiSecret,
-                                     String appName,
-                                     String subDomain,
-                                     String domain,
-                                     String userObjectName,
-                                     Integer apiVersionNumber) {
-    instance.setSession(new StackMobSession(apiKey, apiSecret, appName, subDomain, domain, userObjectName, apiVersionNumber));
-    return instance;
-  }
-
-  public static StackMob getInstance() { return instance; }
-
-  private StackMob() {
+  public StackMob(String apiKey,
+                  String apiSecret,
+                  String appName,
+                  String subDomain,
+                  String domain,
+                  String userObjectName,
+                  Integer apiVersionNumber) {
+      setSession(new StackMobSession(apiKey, apiSecret, appName, subDomain, domain, userObjectName, apiVersionNumber));
   }
 
   public void setApplication(String apiKey, String apiSecret,

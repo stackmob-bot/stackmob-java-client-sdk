@@ -40,185 +40,194 @@ import com.stackmob.sdk.net.HttpVerb;
 
 public class StackMobRequest {
 
-  private static final String URL_FMT = "api.mob1.stackmob.com";
-  private static final String SECURE_SCHEME = "https";
-  private static final String REGULAR_SCHEME = "http";
+    private static final String URL_FMT = "api.mob1.stackmob.com";
+    private static final String SECURE_SCHEME = "https";
+    private static final String REGULAR_SCHEME = "http";
 
-  private StackMobSession session;
-  public String methodName;
-  public boolean isUserBased = false;
-  public Boolean isSecure = true;
-  public HttpVerb httpMethod = HttpVerb.GET;
+    private StackMobSession session;
+    private String sessionKey;
+    private String sessionSecret;
+    public String methodName;
+    public boolean isUserBased = false;
+    public Boolean isSecure = true;
+    public HttpVerb httpMethod = HttpVerb.GET;
 
-  //default to doing nothing
-  public StackMobCallback callback = new StackMobCallback() {
-	  @Override
-	  public void success(String s) {}
-	  @Override
-	  public void failure(StackMobException e) {}
-  };
+    //default to doing nothing
+    public StackMobCallback callback = new StackMobCallback() {
+        @Override
+        public void success(String s) {}
+        @Override
+        public void failure(StackMobException e) {}
+    };
 
-  public HashMap<String, Object> params;
-  public Object requestObject;
+    public HashMap<String, Object> params;
+    public Object requestObject;
 
-  public StackMobRequest(StackMobSession session) {
-    this.session = session;
-  }
-
-  public void sendRequest() {
-
-    try {
-      String response = null;
-
-      switch(httpMethod) {
-        case GET:
-          response = sendGetRequest();
-          break;
-
-        case POST:
-          response = sendPostRequest();
-          break;
-
-        case PUT:
-          response = sendPutRequest();
-          break;
-
-        case DELETE:
-          response = sendDeleteRequest();
-          break;
-      }
-
-      callback.success(response);
-
-    } catch (StackMobException e) {
-      callback.failure(e);
+    public StackMobRequest(StackMobSession session) {
+      this.session = session;
+      this.sessionKey = session.getKey();
+      this.sessionSecret = session.getSecret();
     }
 
-  }
+    public void sendRequest() {
 
-  private String sendGetRequest() throws StackMobException {
-    URI uri;
-    String ret;
+        try {
+            String response = null;
 
-    try {
-      String query = null;
-      if (null != params) {
-        query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
-      }
+            switch(httpMethod) {
+                case GET:
+                    response = sendGetRequest();
+                    break;
+                case POST:
+                    response = sendPostRequest();
+                    break;
+                case PUT:
+                    response = sendPutRequest();
+                    break;
+                case DELETE:
+                    response = sendDeleteRequest();
+                    break;
+            }
 
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-      ret = HttpHelper.doGet(uri);
+            callback.success(response);
 
-    } catch (URISyntaxException e) {
-      throw new StackMobException(e.getMessage());
+        }
+        catch (StackMobException e) {
+            callback.failure(e);
+        }
+
     }
 
-    return ret;
-  }
+    private String sendGetRequest() throws StackMobException {
+        URI uri;
+        String ret;
 
-  private String sendPostRequest() throws StackMobException {
-    URI uri;
-    String ret;
+        try {
+            String query = null;
+            if (null != params) {
+                query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
+            }
 
-    try {
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
+            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret);
+        }
+        catch (URISyntaxException e) {
+            throw new StackMobException(e.getMessage());
+        }
 
-      HttpEntity entity = null;
-      if (null != params) {
-        entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
-      } else if (null != requestObject) {
-        Gson gson = new Gson();
-        entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
-      }
-
-      ret = HttpHelper.doPost(uri, entity);
-
-    } catch (URISyntaxException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (UnsupportedEncodingException e) {
-      throw new StackMobException(e.getMessage());
+        return ret;
     }
 
-    return ret;
-  }
+    private String sendPostRequest() throws StackMobException {
+        URI uri;
+        String ret;
 
-  private String sendPutRequest() throws StackMobException {
-    URI uri;
-    String ret;
+        try {
+            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
 
-    try {
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
+            HttpEntity entity = null;
+            if (null != params) {
+                entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
+            }
+            else if (null != requestObject) {
+                Gson gson = new Gson();
+                entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
+            }
 
-      HttpEntity entity = null;
-      if (null != params) {
-        entity = new UrlEncodedFormEntity(getParamsForRequest(),HTTP.UTF_8);
-      } else if (null != requestObject) {
-        Gson gson = new Gson();
-        entity = new StringEntity(gson.toJson(requestObject),HTTP.UTF_8);
-      }
+            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret);
 
-      ret = HttpHelper.doPut(uri, entity);
-
-    } catch (URISyntaxException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (UnsupportedEncodingException e) {
-      throw new StackMobException(e.getMessage());
+        }
+        catch (URISyntaxException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        return ret;
     }
 
-    return ret;
-  }
+    private String sendPutRequest() throws StackMobException {
+        URI uri;
+        String ret;
 
-  private String sendDeleteRequest() throws StackMobException {
-    URI uri;
-    String ret;
+        try {
+            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
 
-    try {
-      String query = null;
-      if (null != params) {
-        query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
-      }
+            HttpEntity entity = null;
+            if (null != params) {
+                entity = new UrlEncodedFormEntity(getParamsForRequest(),HTTP.UTF_8);
+            }
+            else if (null != requestObject) {
+                Gson gson = new Gson();
+                entity = new StringEntity(gson.toJson(requestObject),HTTP.UTF_8);
+            }
 
-      uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-      ret = HttpHelper.doDelete(uri);
+            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret);
+        }
+        catch (URISyntaxException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new StackMobException(e.getMessage());
+        }
 
-    } catch (URISyntaxException e) {
-      throw new StackMobException(e.getMessage());
+        return ret;
     }
 
-    return ret;
-  }
+    private String sendDeleteRequest() throws StackMobException {
+        URI uri;
+        String ret;
 
-  private String getPath() {
-    if (isUserBased) {
-      return "/" + session.getUserObjectName() + "/" + methodName;
-    } else {
-      return "/" + methodName;
-    }
-  }
+        try {
+            String query = null;
+            if (null != params) {
+                query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
+            }
 
-  private String getScheme() {
-    if (isSecure) {
-      return SECURE_SCHEME;
-    } else {
-      return REGULAR_SCHEME;
-    }
-  }
+            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret);
 
-  private String getHost() {
-      return URL_FMT;
-  }
+        }
+        catch (URISyntaxException e) {
+            throw new StackMobException(e.getMessage());
+        }
 
-  private List<NameValuePair> getParamsForRequest() {
-    if (null == params) {
-      return null;
+        return ret;
     }
 
-    List<NameValuePair> ret = new ArrayList<NameValuePair>(params.size());
-    for (String key : params.keySet()) {
-      ret.add(new BasicNameValuePair(key, params.get(key).toString()));
+    private String getPath() {
+        if (isUserBased) {
+            return "/" + session.getUserObjectName() + "/" + methodName;
+        }
+        else {
+            return "/" + methodName;
+        }
     }
 
-    return ret;
-  }
+    private String getScheme() {
+        if (isSecure) {
+            return SECURE_SCHEME;
+        }
+        else {
+            return REGULAR_SCHEME;
+        }
+    }
+
+    private String getHost() {
+        return URL_FMT;
+    }
+
+    private List<NameValuePair> getParamsForRequest() {
+        if (null == params) {
+            return null;
+        }
+
+        List<NameValuePair> ret = new ArrayList<NameValuePair>(params.size());
+        for (String key : params.keySet()) {
+            ret.add(new BasicNameValuePair(key, params.get(key).toString()));
+        }
+
+        return ret;
+    }
 
 }

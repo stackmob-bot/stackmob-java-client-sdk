@@ -37,6 +37,7 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -46,7 +47,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
-import com.stackmob.sdk.api.StackMob;
 import com.stackmob.sdk.exception.StackMobException;
 
 public class HttpHelper {
@@ -59,14 +59,14 @@ public class HttpHelper {
   private static DefaultHttpClient mHttpClient;
   private static OAuthConsumer mConsumer;
 
-  public static void maybeCreateHttpClient() {
+  public static void maybeCreateHttpClient(String sessionKey, String sessionSecret) {
     if (mHttpClient == null) {
-      mHttpClient = setupHttpClient();
+      mHttpClient = setupHttpClient(sessionKey, sessionSecret);
     }
   }
 
-  public static String doGet(URI uri) throws StackMobException {
-    maybeCreateHttpClient();
+  public static String doGet(URI uri, String sessionKey, String sessionSecret) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpGet request = new HttpGet(uri);
@@ -89,8 +89,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doPost(URI uri, HttpEntity entity) throws StackMobException {
-    maybeCreateHttpClient();
+  public static String doPost(URI uri, HttpEntity entity, String sessionKey, String sessionSecret) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpPost request = new HttpPost(uri);
@@ -118,8 +118,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doPut(URI uri, HttpEntity entity) throws StackMobException {
-    maybeCreateHttpClient();
+  public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpPut request = new HttpPut(uri);
@@ -147,8 +147,8 @@ public class HttpHelper {
     }
   }
 
-  public static String doDelete(URI uri) throws StackMobException {
-    maybeCreateHttpClient();
+  public static String doDelete(URI uri, String sessionKey, String sessionSecret) throws StackMobException {
+    maybeCreateHttpClient(sessionKey, sessionSecret);
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpDelete request = new HttpDelete(uri);
@@ -171,17 +171,16 @@ public class HttpHelper {
     }
   }
 
-  private static DefaultHttpClient setupHttpClient() {
+  private static DefaultHttpClient setupHttpClient(String sessionKey, String sessionSecret) {
     HttpParams httpParams = new BasicHttpParams();
     setConnectionParams(httpParams);
     SchemeRegistry schemeRegistry = registerFactories();
-    ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
+    ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(schemeRegistry);
 
     DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
-    client.setRedirectHandler(new FollowPostRedirectHandler());
+    client.setRedirectStrategy(new HttpRedirectStrategy());
 
-    StackMob stackmob = StackMob.getInstance();
-    mConsumer = new CommonsHttpOAuthConsumer(stackmob.getSession().getKey(), stackmob.getSession().getSecret());
+    mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
 
     return client;
   }
@@ -192,7 +191,7 @@ public class HttpHelper {
   private static SchemeRegistry registerFactories() {
     SchemeRegistry schemeRegistry = new SchemeRegistry();
     schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-    schemeRegistry.register(new Scheme("https", new SimpleSSLSocketFactory(), 443));
+    schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
     return schemeRegistry;
   }
 
