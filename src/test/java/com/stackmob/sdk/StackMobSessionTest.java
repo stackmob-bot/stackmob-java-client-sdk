@@ -22,13 +22,7 @@ import static org.junit.Assert.*;
 import com.stackmob.sdk.api.*;
 
 public class StackMobSessionTest {
-    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0",
-            "81573b21-b948-4339-baa3-dbffe0ca4503",
-            "androidtest",
-            "fithsaring.mob1",
-            "stackmob.com",
-            "user",
-            0);
+    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", "81573b21-b948-4339-baa3-dbffe0ca4503", "user", 0);
 
     @Test
     public void testSessionInitializedCorrectly() {

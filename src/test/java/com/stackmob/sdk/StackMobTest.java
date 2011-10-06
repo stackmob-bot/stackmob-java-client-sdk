@@ -36,12 +36,7 @@ import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
 
 public class StackMobTest {
-    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0",
-            "81573b21-b948-4339-baa3-dbffe0ca4503", "androidtest",
-            "stackmob",
-            "stackmob.com",
-            "user",
-            0);
+    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", "81573b21-b948-4339-baa3-dbffe0ca4503", "user", 0);
 
     public static class Game {
 
