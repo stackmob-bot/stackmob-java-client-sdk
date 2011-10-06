@@ -35,9 +35,6 @@ public class StackMobSessionTest {
         StackMobSession session = stackmob.getSession();
         assertEquals("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", session.getKey());
         assertEquals("81573b21-b948-4339-baa3-dbffe0ca4503", session.getSecret());
-        assertEquals("androidtest", session.getAppName());
-        assertEquals("fithsaring.mob1", session.getSubDomain());
-        assertEquals("stackmob.com", session.getDomain());
         assertEquals("user", session.getUserObjectName());
         assertEquals(0, session.getApiVersionNumber());
     }

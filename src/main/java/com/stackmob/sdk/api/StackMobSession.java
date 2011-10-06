@@ -20,9 +20,6 @@ public class StackMobSession {
 
   private String key;
   private String secret;
-  private String appName;
-  private String subDomain;
-  private String domain;
   private String userObjectName;
   private int apiVersionNumber;
 
@@ -31,14 +28,10 @@ public class StackMobSession {
 
   private String facebookAppId;
 
-  public StackMobSession(String key, String secret, String appName, String subDomain,
-                         String domain, String userObjectName, int apiVersionNumber) {
+  public StackMobSession(String key, String secret, String userObjectName, int apiVersionNumber) {
 
     this.key = key;
     this.secret = secret;
-    this.appName = appName;
-    this.subDomain = subDomain;
-    this.domain = domain;
     this.userObjectName = userObjectName;
     this.apiVersionNumber = apiVersionNumber;
   }
@@ -57,30 +50,6 @@ public class StackMobSession {
 
   public void setSecret(String secret) {
     this.secret = secret;
-  }
-
-  public String getAppName() {
-    return appName;
-  }
-
-  public void setAppName(String appName) {
-    this.appName = appName;
-  }
-
-  public String getSubDomain() {
-    return subDomain;
-  }
-
-  public void setSubDomain(String subDomain) {
-    this.subDomain = subDomain;
-  }
-
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
   }
 
   public String getUserObjectName() {
