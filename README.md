@@ -6,6 +6,10 @@ The StackMob Java SDK provides a native Java SDK to the your app's API on StackM
 
 * [0.1.0](http://stackmob.github.com/stackmob-java-sdk/javadoc/0.1.0/apidocs/)
 
+## Downloads
+
+* [0.1.0](http://stackmob.github.com/stackmob-java-sdk/downloads/0.1.0/stackmob-java-sdk-0.1.0-SNAPSHOT.jar)
+
 ## Copyright
 
 Copyright 2011 StackMob
