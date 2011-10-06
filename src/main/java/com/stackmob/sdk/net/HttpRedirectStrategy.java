@@ -30,21 +30,22 @@ import java.util.Arrays;
 import java.net.URI;
 
 public class HttpRedirectStrategy implements RedirectStrategy {
-    public static final int HTTP_REDIRECT_STATUS_CODE = 302; // StackMob uses the FOUND redirect (302)
-    private StackMobRedirectedCallback redirectedCallback;
+
+    private final StackMobRedirectedCallback redirectedCallback;
 
     public HttpRedirectStrategy(StackMobRedirectedCallback redirectedCallback) {
       this.redirectedCallback = redirectedCallback;
     }
 
+    @Override
     public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context)
         throws ProtocolException {
         RequestWrapper wrapper = new RequestWrapper(request);
-        if(response.getStatusLine().getStatusCode() == HTTP_REDIRECT_STATUS_CODE) {
+        if(isRedirected(request, response, context)) {
             List<Header> headers = Arrays.asList(response.getAllHeaders());
             Header newLocHeader = null;
             for(Header h : headers) {
-                if(h.getName().equals("Location")) {
+                if(HttpHeaders.LOCATION.equalsIgnoreCase(h.getName())) {
                     newLocHeader = h;
                 }
             }
@@ -64,7 +65,9 @@ public class HttpRedirectStrategy implements RedirectStrategy {
         return wrapper;
     }
 
+    @Override
     public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) {
-        return response.getStatusLine().getStatusCode() == HTTP_REDIRECT_STATUS_CODE;
+        return response.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY;
     }
+
 }

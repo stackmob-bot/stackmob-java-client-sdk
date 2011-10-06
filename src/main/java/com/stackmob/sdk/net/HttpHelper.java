@@ -27,6 +27,7 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -52,15 +53,13 @@ import com.stackmob.sdk.exception.StackMobException;
 
 public class HttpHelper {
 
-  private static final String ACCEPT = "Accept";
   private static final int CONN_TIMEOUT = 20000;
   private static final String DEFAULT_CONTENT_TYPE_FMT = "application/vnd.stackmob+json; version=%d";
   private static String DEFAULT_CONTENT_TYPE;
-
   private static DefaultHttpClient mHttpClient;
   private static OAuthConsumer mConsumer;
 
-  private static void maybeCreateHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
+  private static synchronized void maybeCreateHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
     if (mHttpClient == null) {
       mHttpClient = setupHttpClient(sessionKey, sessionSecret, redirCB);
     }
@@ -71,8 +70,8 @@ public class HttpHelper {
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpGet request = new HttpGet(uri);
-    request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
 
     try {
       mConsumer.sign(request);
@@ -100,8 +99,8 @@ public class HttpHelper {
       request.setEntity(entity);
     }
 
-    request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
 
     try {
       mConsumer.sign(request);
@@ -129,8 +128,8 @@ public class HttpHelper {
       request.setEntity(entity);
     }
 
-    request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
 
     try {
       mConsumer.sign(request);
@@ -153,8 +152,8 @@ public class HttpHelper {
     ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
     HttpDelete request = new HttpDelete(uri);
-    request.setHeader(HTTP.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(ACCEPT, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
 
     try {
       mConsumer.sign(request);

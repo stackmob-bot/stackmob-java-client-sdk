@@ -45,16 +45,15 @@ public class StackMobRequest {
     protected static final String SECURE_SCHEME = "https";
     protected static final String REGULAR_SCHEME = "http";
 
-    protected StackMobSession session;
-    protected String sessionKey;
-    protected String sessionSecret;
+    protected final StackMobSession session;
+    protected final String sessionKey;
+    protected final StackMobRedirectedCallback redirectedCallback;
+    protected final String sessionSecret;
+
     protected String methodName;
-
     protected String urlFormat = DEFAULT_URL_FORMAT;
-
     protected Boolean isSecure = true;
     protected HttpVerb httpMethod = HttpVerb.GET;
-
     protected Map<String, Object> params;
     protected Object requestObject;
 
@@ -65,8 +64,6 @@ public class StackMobRequest {
         @Override
         public void failure(StackMobException e) {}
     };
-
-    protected StackMobRedirectedCallback redirectedCallback;
 
     //default constructor - not available for public consumption
     private StackMobRequest(StackMobSession session, String method, StackMobRedirectedCallback redirCB) {
@@ -188,11 +185,11 @@ public class StackMobRequest {
 
             HttpEntity entity = null;
             if (null != params) {
-                entity = new UrlEncodedFormEntity(getParamsForRequest(),HTTP.UTF_8);
+                entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
             }
             else if (null != requestObject) {
                 Gson gson = new Gson();
-                entity = new StringEntity(gson.toJson(requestObject),HTTP.UTF_8);
+                entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
             ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, redirectedCallback);

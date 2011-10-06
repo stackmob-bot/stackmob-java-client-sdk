@@ -20,5 +20,5 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 
 public interface StackMobRedirectedCallback {
-    public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest);
+    void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest);
 }

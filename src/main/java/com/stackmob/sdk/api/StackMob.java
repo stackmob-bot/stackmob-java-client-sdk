@@ -29,6 +29,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 
 public class StackMob {
+
     private StackMobSession session;
     private String urlFormat = StackMobRequest.DEFAULT_URL_FORMAT;
     private final Object urlFormatLock = new Object();
@@ -52,7 +53,7 @@ public class StackMob {
             try {
                 URI uri = new URI(newRequest.getRequestLine().getUri());
                 synchronized(urlFormatLock) {
-                    if(!urlFormat.equals(uri.getHost())) {
+                    if(!urlFormat.equalsIgnoreCase(uri.getHost())) {
                         urlFormat = uri.getHost();
                         userRedirectedCallback.redirected(origRequest, response, newRequest);
                     }
@@ -345,4 +346,5 @@ public class StackMob {
     public StackMobSession getSession() {
         return session;
     }
+
 }
