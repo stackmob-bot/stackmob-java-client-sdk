@@ -18,18 +18,15 @@ package com.stackmob.sdk.net;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import org.apache.http.*;
-import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.RequestWrapper;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
 
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Arrays;
 
-import java.net.URI;
-
-public class HttpRedirectStrategy implements RedirectStrategy {
+public class HttpRedirectStrategy extends DefaultRedirectStrategy {
+    public static final int RedirectStatusCode = HttpStatus.SC_MOVED_TEMPORARILY;//302
 
     private final StackMobRedirectedCallback redirectedCallback;
 
@@ -38,36 +35,23 @@ public class HttpRedirectStrategy implements RedirectStrategy {
     }
 
     @Override
-    public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context)
-        throws ProtocolException {
-        RequestWrapper wrapper = new RequestWrapper(request);
-        if(isRedirected(request, response, context)) {
-            List<Header> headers = Arrays.asList(response.getAllHeaders());
-            Header newLocHeader = null;
-            for(Header h : headers) {
-                if(HttpHeaders.LOCATION.equalsIgnoreCase(h.getName())) {
-                    newLocHeader = h;
-                }
-            }
-            if(newLocHeader ==  null) {
-                throw new ProtocolException("301 given for redirect, but no location given");
-            }
+    public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context) throws ProtocolException {
+        HttpUriRequest redir = super.getRedirect(request, response, context);
 
-            try {
-                wrapper.setURI(new URI(newLocHeader.getValue()));
-                redirectedCallback.redirected(request, response, wrapper);
+        if(isRedirected(request, response, context)) {
+            List<Header> newLocHeaders = Arrays.asList(redir.getHeaders(HttpHeaders.LOCATION));
+            if(newLocHeaders.size() < 1) {
+                throw new ProtocolException(RedirectStatusCode + " given for redirect, but no location given");
             }
-            catch(URISyntaxException e) {
-                throw new ProtocolException("problem with location headers: " + e.getMessage());
-            }
+            redirectedCallback.redirected(request, response, redir);
         }
 
-        return wrapper;
+        return redir;
     }
 
     @Override
     public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) {
-        return response.getStatusLine().getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY;
+        return response.getStatusLine().getStatusCode() == RedirectStatusCode;
     }
 
 }
