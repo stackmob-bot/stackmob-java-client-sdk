@@ -112,24 +112,6 @@ public class StackMob {
     }
 
     /**
-    * set the twitter consumer key and secret for this app
-    * @param consumerKey the twitter consumer key for this app
-    * @param consumerSecret the twitter consumer secret for this app
-    */
-    public void setTwitterConsumer(String consumerKey, String consumerSecret) {
-        session.setTwitterConsumerKey(consumerKey);
-        session.setTwitterConsumerSecret(consumerSecret);
-    }
-
-    /**
-     * set the facebook app ID for this app
-     * @param appId the facebook app ID
-     */
-    public void setFacebookAppId(String appId) {
-        session.setFacebookAppId(appId);
-    }
-
-    /**
      * call the login method on StackMob
      * @param params parameters to pass to the login method
      * @param callback callback to be called when the server returns. may happen in a separate thread

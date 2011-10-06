@@ -31,7 +31,7 @@ public class HttpRedirectStrategy extends DefaultRedirectStrategy {
     private final StackMobRedirectedCallback redirectedCallback;
 
     public HttpRedirectStrategy(StackMobRedirectedCallback redirectedCallback) {
-      this.redirectedCallback = redirectedCallback;
+        this.redirectedCallback = redirectedCallback;
     }
 
     @Override

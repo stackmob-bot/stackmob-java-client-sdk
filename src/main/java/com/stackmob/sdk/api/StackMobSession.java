@@ -23,11 +23,6 @@ public class StackMobSession {
   private String userObjectName;
   private int apiVersionNumber;
 
-  private String twitterConsumerKey;
-  private String twitterConsumerSecret;
-
-  private String facebookAppId;
-
   public StackMobSession(String key, String secret, String userObjectName, int apiVersionNumber) {
 
     this.key = key;
@@ -40,56 +35,16 @@ public class StackMobSession {
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   public String getSecret() {
     return secret;
-  }
-
-  public void setSecret(String secret) {
-    this.secret = secret;
   }
 
   public String getUserObjectName() {
     return userObjectName;
   }
 
-  public void setUserObjectName(String userObjectName) {
-    this.userObjectName = userObjectName;
-  }
-
   public int getApiVersionNumber() {
     return apiVersionNumber;
-  }
-
-  public void setApiVersionNumber(int apiVersionNumber) {
-    this.apiVersionNumber = apiVersionNumber;
-  }
-
-  public String getTwitterConsumerKey() {
-    return twitterConsumerKey;
-  }
-
-  public void setTwitterConsumerKey(String twitterConsumerKey) {
-    this.twitterConsumerKey = twitterConsumerKey;
-  }
-
-  public String getTwitterConsumerSecret() {
-    return twitterConsumerSecret;
-  }
-
-  public void setTwitterConsumerSecret(String twitterConsumerSecret) {
-    this.twitterConsumerSecret = twitterConsumerSecret;
-  }
-
-  public void setFacebookAppId(String facebookAppId) {
-    this.facebookAppId = facebookAppId;
-  }
-
-  public String getFacebookAppId() {
-    return facebookAppId;
   }
 
 }
