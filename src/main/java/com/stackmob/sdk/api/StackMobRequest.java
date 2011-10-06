@@ -101,7 +101,6 @@ public class StackMobRequest {
     }
 
     public void sendRequest() {
-
         try {
             String response = null;
 
@@ -254,5 +253,4 @@ public class StackMobRequest {
 
         return ret;
     }
-
 }

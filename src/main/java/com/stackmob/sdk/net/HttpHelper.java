@@ -52,154 +52,173 @@ import org.apache.http.protocol.HTTP;
 import com.stackmob.sdk.exception.StackMobException;
 
 public class HttpHelper {
+    private static final int CONN_TIMEOUT = 20000;
+    private static final String DEFAULT_CONTENT_TYPE_FMT = "application/vnd.stackmob+json; version=%d";
+    private static String DEFAULT_CONTENT_TYPE;
+    private static DefaultHttpClient mHttpClient;
+    private static OAuthConsumer mConsumer;
 
-  private static final int CONN_TIMEOUT = 20000;
-  private static final String DEFAULT_CONTENT_TYPE_FMT = "application/vnd.stackmob+json; version=%d";
-  private static String DEFAULT_CONTENT_TYPE;
-  private static DefaultHttpClient mHttpClient;
-  private static OAuthConsumer mConsumer;
-
-  private static synchronized void maybeCreateHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
-    if (mHttpClient == null) {
-      mHttpClient = setupHttpClient(sessionKey, sessionSecret, redirCB);
-    }
-  }
-
-  public static String doGet(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
-    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-    HttpGet request = new HttpGet(uri);
-    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
-
-    try {
-      mConsumer.sign(request);
-      return mHttpClient.execute(request, responseHandler);
-    } catch (OAuthMessageSignerException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthExpectationFailedException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthCommunicationException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (ClientProtocolException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (IOException e) {
-      throw new StackMobException(e.getMessage());
-    }
-  }
-
-  public static String doPost(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
-    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-    HttpPost request = new HttpPost(uri);
-
-    if (null != entity) {
-      request.setEntity(entity);
+    private static synchronized void ensureHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
+        if (mHttpClient == null) {
+            mHttpClient = setupHttpClient(sessionKey, sessionSecret, redirCB);
+        }
     }
 
-    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+    public static String doGet(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+        ensureHttpClient(sessionKey, sessionSecret, redirCB);
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-    try {
-      mConsumer.sign(request);
-      return mHttpClient.execute(request, responseHandler);
-    } catch (OAuthMessageSignerException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthExpectationFailedException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthCommunicationException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (ClientProtocolException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (IOException e) {
-      throw new StackMobException(e.getMessage());
+        HttpGet request = new HttpGet(uri);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+        request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+
+        try {
+            mConsumer.sign(request);
+            return mHttpClient.execute(request, responseHandler);
+        }
+        catch (OAuthMessageSignerException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthExpectationFailedException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthCommunicationException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (ClientProtocolException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (IOException e) {
+            throw new StackMobException(e.getMessage());
+        }
     }
-  }
 
-  public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
-    ResponseHandler<String> responseHandler = new BasicResponseHandler();
+    public static String doPost(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+        ensureHttpClient(sessionKey, sessionSecret, redirCB);
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-    HttpPut request = new HttpPut(uri);
+        HttpPost request = new HttpPost(uri);
 
-    if (null != entity) {
-      request.setEntity(entity);
+        if (null != entity) {
+            request.setEntity(entity);
+        }
+
+        request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+        request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+
+        try {
+            mConsumer.sign(request);
+            return mHttpClient.execute(request, responseHandler);
+        }
+        catch (OAuthMessageSignerException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthExpectationFailedException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthCommunicationException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (ClientProtocolException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (IOException e) {
+            throw new StackMobException(e.getMessage());
+        }
     }
 
-    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+    public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+        ensureHttpClient(sessionKey, sessionSecret, redirCB);
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-    try {
-      mConsumer.sign(request);
-      return mHttpClient.execute(request, responseHandler);
-    } catch (OAuthMessageSignerException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthExpectationFailedException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthCommunicationException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (ClientProtocolException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (IOException e) {
-      throw new StackMobException(e.getMessage());
+        HttpPut request = new HttpPut(uri);
+
+        if (null != entity) {
+            request.setEntity(entity);
+        }
+
+        request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+        request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+
+        try {
+            mConsumer.sign(request);
+            return mHttpClient.execute(request, responseHandler);
+        }
+        catch (OAuthMessageSignerException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthExpectationFailedException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthCommunicationException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (ClientProtocolException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (IOException e) {
+            throw new StackMobException(e.getMessage());
+        }
     }
-  }
 
-  public static String doDelete(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
-    maybeCreateHttpClient(sessionKey, sessionSecret, redirCB);
-    ResponseHandler<String> responseHandler = new BasicResponseHandler();
+    public static String doDelete(URI uri, String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) throws StackMobException {
+        ensureHttpClient(sessionKey, sessionSecret, redirCB);
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-    HttpDelete request = new HttpDelete(uri);
-    request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-    request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
+        HttpDelete request = new HttpDelete(uri);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+        request.setHeader(HttpHeaders.ACCEPT, DEFAULT_CONTENT_TYPE);
 
-    try {
-      mConsumer.sign(request);
-      return mHttpClient.execute(request, responseHandler);
-    } catch (OAuthMessageSignerException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthExpectationFailedException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (OAuthCommunicationException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (ClientProtocolException e) {
-      throw new StackMobException(e.getMessage());
-    } catch (IOException e) {
-      throw new StackMobException(e.getMessage());
+        try {
+            mConsumer.sign(request);
+            return mHttpClient.execute(request, responseHandler);
+        }
+        catch (OAuthMessageSignerException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthExpectationFailedException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (OAuthCommunicationException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (ClientProtocolException e) {
+            throw new StackMobException(e.getMessage());
+        }
+        catch (IOException e) {
+            throw new StackMobException(e.getMessage());
+        }
     }
-  }
 
-  private static DefaultHttpClient setupHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
-    HttpParams httpParams = new BasicHttpParams();
-    setConnectionParams(httpParams);
-    SchemeRegistry schemeRegistry = registerFactories();
-    ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(schemeRegistry);
+    private static DefaultHttpClient setupHttpClient(String sessionKey, String sessionSecret, StackMobRedirectedCallback redirCB) {
+        HttpParams httpParams = new BasicHttpParams();
+        setConnectionParams(httpParams);
+        SchemeRegistry schemeRegistry = registerFactories();
+        ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(schemeRegistry);
 
-    DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
-    client.setRedirectStrategy(new HttpRedirectStrategy(redirCB));
+        DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
+        client.setRedirectStrategy(new HttpRedirectStrategy(redirCB));
 
-    mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
+        mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
 
-    return client;
-  }
-  public static void setVersion(int version) {
-    DEFAULT_CONTENT_TYPE = String.format(DEFAULT_CONTENT_TYPE_FMT, version);
-  }
+        return client;
+    }
 
-  private static SchemeRegistry registerFactories() {
-    SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-    schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
-    return schemeRegistry;
-  }
+    public static void setVersion(int version) {
+        DEFAULT_CONTENT_TYPE = String.format(DEFAULT_CONTENT_TYPE_FMT, version);
+    }
 
-  private static void setConnectionParams(HttpParams httpParams) {
-    HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-    HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
-    HttpConnectionParams.setConnectionTimeout(httpParams, CONN_TIMEOUT);
-    HttpConnectionParams.setSoTimeout(httpParams, CONN_TIMEOUT);
-  }
+    private static SchemeRegistry registerFactories() {
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+        schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+        return schemeRegistry;
+    }
 
+    private static void setConnectionParams(HttpParams httpParams) {
+        HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
+        HttpConnectionParams.setConnectionTimeout(httpParams, CONN_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(httpParams, CONN_TIMEOUT);
+    }
 }

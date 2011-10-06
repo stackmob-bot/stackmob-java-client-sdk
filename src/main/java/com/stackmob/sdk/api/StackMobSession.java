@@ -17,34 +17,31 @@
 package com.stackmob.sdk.api;
 
 public class StackMobSession {
+    private String key;
+    private String secret;
+    private String userObjectName;
+    private int apiVersionNumber;
 
-  private String key;
-  private String secret;
-  private String userObjectName;
-  private int apiVersionNumber;
+    public StackMobSession(String key, String secret, String userObjectName, int apiVersionNumber) {
+        this.key = key;
+        this.secret = secret;
+        this.userObjectName = userObjectName;
+        this.apiVersionNumber = apiVersionNumber;
+    }
 
-  public StackMobSession(String key, String secret, String userObjectName, int apiVersionNumber) {
+    public String getKey() {
+        return key;
+    }
 
-    this.key = key;
-    this.secret = secret;
-    this.userObjectName = userObjectName;
-    this.apiVersionNumber = apiVersionNumber;
-  }
+    public String getSecret() {
+        return secret;
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getUserObjectName() {
+        return userObjectName;
+    }
 
-  public String getSecret() {
-    return secret;
-  }
-
-  public String getUserObjectName() {
-    return userObjectName;
-  }
-
-  public int getApiVersionNumber() {
-    return apiVersionNumber;
-  }
-
+    public int getApiVersionNumber() {
+        return apiVersionNumber;
+    }
 }

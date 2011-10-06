@@ -38,9 +38,9 @@ public class HttpRedirectStrategy extends DefaultRedirectStrategy {
     public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context) throws ProtocolException {
         HttpUriRequest redir = super.getRedirect(request, response, context);
 
-        if(isRedirected(request, response, context)) {
+        if (isRedirected(request, response, context)) {
             List<Header> newLocHeaders = Arrays.asList(redir.getHeaders(HttpHeaders.LOCATION));
-            if(newLocHeaders.size() < 1) {
+            if (newLocHeaders.size() < 1) {
                 throw new ProtocolException(RedirectStatusCode + " given for redirect, but no location given");
             }
             redirectedCallback.redirected(request, response, redir);

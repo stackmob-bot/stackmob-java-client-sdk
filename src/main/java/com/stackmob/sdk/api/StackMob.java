@@ -35,14 +35,14 @@ public class StackMob {
     private final Object urlFormatLock = new Object();
 
     protected static class RegistrationIDAndUser {
-      public String userId;
-      public Map<String, String> token = new HashMap<String, String>();
+        public String userId;
+        public Map<String, String> token = new HashMap<String, String>();
 
-      public RegistrationIDAndUser(String registrationID, String user) {
-          userId = user;
-          token.put("token", registrationID);
-          token.put("type", "android");
-      }
+        public RegistrationIDAndUser(String registrationID, String user) {
+            userId = user;
+            token.put("token", registrationID);
+            token.put("type", "android");
+        }
     }
 
     protected StackMobRedirectedCallback userRedirectedCallback;
@@ -53,7 +53,7 @@ public class StackMob {
             try {
                 URI uri = new URI(newRequest.getRequestLine().getUri());
                 synchronized(urlFormatLock) {
-                    if(!urlFormat.equalsIgnoreCase(uri.getHost())) {
+                    if (!urlFormat.equalsIgnoreCase(uri.getHost())) {
                         urlFormat = uri.getHost();
                         userRedirectedCallback.redirected(origRequest, response, newRequest);
                     }

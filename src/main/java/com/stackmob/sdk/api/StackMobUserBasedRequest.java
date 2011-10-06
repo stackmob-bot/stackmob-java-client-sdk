@@ -21,7 +21,6 @@ import com.stackmob.sdk.callback.StackMobCallback;
 import java.util.Map;
 
 public class StackMobUserBasedRequest extends StackMobRequest {
-
     public StackMobUserBasedRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
         super(session, method, callback, redirCB);
     }
@@ -40,5 +39,4 @@ public class StackMobUserBasedRequest extends StackMobRequest {
         this.urlFormat = urlFormat;
         return this;
     }
-  
 }

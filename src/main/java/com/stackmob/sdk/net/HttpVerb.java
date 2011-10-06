@@ -17,5 +17,5 @@
 package com.stackmob.sdk.net;
 
 public enum HttpVerb {
-  GET, POST, PUT, DELETE
+    GET, POST, PUT, DELETE
 }

@@ -17,11 +17,8 @@
 package com.stackmob.sdk.exception;
 
 public class StackMobException extends Exception {
-
-  private static final long serialVersionUID = 1L;
-
-  public StackMobException(String message) {
-    super(message);
-  }
-
+    private static final long serialVersionUID = 1L;
+    public StackMobException(String message) {
+        super(message);
+    }
 }
