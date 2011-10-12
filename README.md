@@ -19,7 +19,6 @@ Hopefully you can see the pattern here. With this library, you can connect almos
     <groupId>com.stackmob</groupId>
     <artifactId>stackmob-java-client-sdk</artifactId>
     <version>0.1.1</version>
-    <scope>compile</scope>
 </dependency>
 ```
 
