@@ -27,12 +27,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stackmob</groupId>
-    <artifactId>stackmob-java-sdk</artifactId>
+    <artifactId>stackmob-java-client-sdk</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Stackmob Java SDK</name>
     <description>The Stackmob Java SDK.</description>
-    <url>https://github.com/stackmob/stackmob-java-sdk</url>
+    <url>https://github.com/stackmob/stackmob-java-client-sdk</url>
 
     <licenses>
         <license>
@@ -43,9 +43,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/stackmob/stackmob-java-sdk</url>
-        <connection>scm:git:git@github.com:stackmob/stackmob-java-sdk.git</connection>
-        <developerConnection>scm:git:git@github.com:stackmob/stackmob-java-sdk.git</developerConnection>
+        <url>https://github.com/stackmob/stackmob-java-client-sdk</url>
+        <connection>scm:git:git@github.com:stackmob/stackmob-java-client-sdk.git</connection>
+        <developerConnection>scm:git:git@github.com:stackmob/stackmob-java-client-sdk.git</developerConnection>
     </scm>
 
     <developers>
@@ -98,7 +98,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/stackmob/stackmob-java-sdk/issues</url>
+        <url>https://github.com/stackmob/stackmob-java-client-sdk/issues</url>
     </issueManagement>
 
     <properties>
