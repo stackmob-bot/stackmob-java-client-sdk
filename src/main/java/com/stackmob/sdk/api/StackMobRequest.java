@@ -138,7 +138,12 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            if(session.getAppName() != null) {
+                ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
+            }
+            else {
+                ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            }
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -163,7 +168,12 @@ public class StackMobRequest {
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
-            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            if(session.getAppName() != null) {
+                ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
+            }
+            else {
+                ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            }
 
         }
         catch (URISyntaxException e) {
@@ -190,8 +200,12 @@ public class StackMobRequest {
                 Gson gson = new Gson();
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
-
-            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            if(session.getAppName() != null) {
+                ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
+            }
+            else {
+                ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            }
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -214,8 +228,12 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
-
+            if(session.getAppName() != null) {
+                ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
+            }
+            else {
+                ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
+            }
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());

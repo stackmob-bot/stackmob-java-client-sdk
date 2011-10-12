@@ -16,11 +16,19 @@
 
 package com.stackmob.sdk.api;
 
+import com.sun.tools.corba.se.idl.toJavaPortable.StringGen;
+
 public class StackMobSession {
     private String key;
     private String secret;
     private String userObjectName;
     private int apiVersionNumber;
+    private String appName = null;
+
+    public StackMobSession(String key, String secret, String userObjectName, String appName, int apiVersionNumber) {
+        this(key, secret, userObjectName, apiVersionNumber);
+        this.appName = appName;
+    }
 
     public StackMobSession(String key, String secret, String userObjectName, int apiVersionNumber) {
         this.key = key;
@@ -43,5 +51,9 @@ public class StackMobSession {
 
     public int getApiVersionNumber() {
         return apiVersionNumber;
+    }
+
+    public String getAppName() {
+        return appName;
     }
 }

@@ -66,11 +66,23 @@ public class StackMob {
     };
 
     /**
+     * create a new StackMob object. this is the preferred constructor
+     * @param apiKey the api key for your app
+     * @param apiSecret the api secret for your app
+     * @param userObjectName the name of your app's user object. if you do not have a user object, pass the empty strinrg here and do not use the login, logout, facebook or twitter methods, as they will fail
+     * @param appName the name of your application
+     * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
+     */
+    public StackMob(String apiKey, String apiSecret, String userObjectName, String appName, Integer apiVersionNumber) {
+        setSession(new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber));
+    }
+
+    /**
     * create a new StackMob object
     * @param apiKey the api key for your app
     * @param apiSecret the api secret for your app
     * @param userObjectName the name of your app's user object. if you do not have a user object, pass the empty string here and do not use the login, logout, facebook or twitter methods, as they will fail
-    * @param apiVersionNumber the version of your app's API that you want to use with this object. pass 0 for sandbox
+    * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
     */
     public StackMob(String apiKey, String apiSecret, String userObjectName, Integer apiVersionNumber) {
         setSession(new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber));
