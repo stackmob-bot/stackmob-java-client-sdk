@@ -1,6 +1,6 @@
 # Stackmob Java Client SDK
 
-With the StackMob Java Client SDK, you can integrate your StackMob application into any Java / JVM compatible codebase.
+With the StackMob Java Client SDK, you can integrate your StackMob application into any Java / JVM application.
 
 Here are some example usages:
 
