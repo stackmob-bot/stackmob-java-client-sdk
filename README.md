@@ -8,7 +8,7 @@ Here are some example usages:
 * Connect your Java command line utility to your StackMob app
 * Connect your Tomcat, JBoss, etc... app to your StackMob app
 
-Hopefully you can see the pattern here. With this library, you can connect any JVM to your StackMob app.
+Hopefully you can see the pattern here. With this library, you can connect almost any JVM to your StackMob app.
 
 ## Getting Started
 
