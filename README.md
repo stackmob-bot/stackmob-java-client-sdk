@@ -26,7 +26,7 @@ Hopefully you can see the pattern here. With this library, you can connect almos
 ### With SBT
 
 ```scala
-libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.3.1" % "compile"
+libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.1"
 ```
 
 ### Without Maven
