@@ -1,6 +1,15 @@
-# Stackmob Custom Code SDK
+# Stackmob Java Client SDK
 
-The StackMob Java SDK provides a native Java SDK to the your app's API on StackMob.
+With the StackMob Java Client SDK, you can integrate your StackMob application into any Java / JVM compatible codebase.
+
+Here are some example usages:
+
+* Connect your Google App Engine app to your StackMob application
+* Connect your Android app to your StackMob application (there is also an [https://github.com/stackmob/Stackmob_Android](Android SDK) that provides more Android specific functionality)
+* Connect your Java commandline utility to your StackMob Application
+* Connect your Tomcat, JBoss, etc... app to your StackMob application
+
+Hopefully you can see the pattern here. With this library, you can connect any JVM to your StackMob app.
 
 ## Getting Started
 
