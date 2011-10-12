@@ -19,7 +19,7 @@ Using Maven is the best way to install with the Java SDK because it makes it eas
 ```xml
 <dependency>
     <groupId>com.stackmob</groupId>
-    <artifactId>stackmob-java-sdk</artifactId>
+    <artifactId>stackmob-java-client-sdk</artifactId>
     <version>0.1.1</version>
     <scope>compile</scope>
 </dependency>
