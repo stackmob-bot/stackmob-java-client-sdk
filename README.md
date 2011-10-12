@@ -5,7 +5,7 @@ With the StackMob Java Client SDK, you can integrate your StackMob application i
 Here are some example usages:
 
 * Connect your Android app to your StackMob app (there is also an [https://github.com/stackmob/Stackmob_Android](Android SDK) that provides more Android specific functionality)
-* Connect your Java commandline utility to your StackMob app
+* Connect your Java command line utility to your StackMob app
 * Connect your Tomcat, JBoss, etc... app to your StackMob app
 
 Hopefully you can see the pattern here. With this library, you can connect any JVM to your StackMob app.
