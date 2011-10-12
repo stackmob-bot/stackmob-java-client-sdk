@@ -17,8 +17,8 @@ Hopefully you can see the pattern here. With this library, you can connect almos
 Using Maven is the best way to install with the Java SDK because it makes it easy for you to keep up to date. Here's how:
 
 1. ``` git clone git@github.com:stackmob/stackmob-java-sdk.git ```
-2. cd stackmob-java-sdk
-3. mvn install
+2. ``` cd stackmob-java-sdk ```
+3. ``` mvn install ```
 4. add this to your pom.xml file:
 
 ```xml
