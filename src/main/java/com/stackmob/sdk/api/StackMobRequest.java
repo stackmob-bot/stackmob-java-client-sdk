@@ -66,12 +66,12 @@ public class StackMobRequest {
     };
 
     //default constructor - not available for public consumption
-    private StackMobRequest(StackMobSession session, String method, StackMobRedirectedCallback redirCB) {
+    private StackMobRequest(StackMobSession session, String method, StackMobRedirectedCallback cb) {
         this.session = session;
         this.sessionKey = session.getKey();
         this.sessionSecret = session.getSecret();
         this.methodName = method;
-        this.redirectedCallback = redirCB;
+        this.redirectedCallback = cb;
     }
 
     public StackMobRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
@@ -138,7 +138,7 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, redirectedCallback);
+            ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -163,7 +163,7 @@ public class StackMobRequest {
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
-            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, redirectedCallback);
+            ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
 
         }
         catch (URISyntaxException e) {
@@ -191,7 +191,7 @@ public class StackMobRequest {
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
-            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, redirectedCallback);
+            ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
@@ -214,7 +214,7 @@ public class StackMobRequest {
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, redirectedCallback);
+            ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
 
         }
         catch (URISyntaxException e) {
