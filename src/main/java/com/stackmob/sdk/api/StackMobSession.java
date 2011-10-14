@@ -16,8 +16,6 @@
 
 package com.stackmob.sdk.api;
 
-import com.sun.tools.corba.se.idl.toJavaPortable.StringGen;
-
 public class StackMobSession {
     private String key;
     private String secret;
