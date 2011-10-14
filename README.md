@@ -19,14 +19,13 @@ Hopefully you can see the pattern here. With this library, you can connect almos
     <groupId>com.stackmob</groupId>
     <artifactId>stackmob-java-client-sdk</artifactId>
     <version>0.1.1</version>
-    <scope>compile</scope>
 </dependency>
 ```
 
 ### With SBT
 
 ```scala
-libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.3.1" % "compile"
+libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.1"
 ```
 
 ### Without Maven
@@ -81,6 +80,11 @@ stackmob.post("MyObject", object, new StackMobCallback() {
 Once you have it, you can use the StackMob object to execute a wide range of operations against your app on StackMob's servers. Check out the
 [javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.1/apidocs/) for more.
 
+## Issues
+We use Github to track issues with the SDK. If you find any issues, please report them [here](https://github.com/stackmob/stackmob-java-client-sdk/issues), and include as many details as possible about the issue you encountered.
+
+## Contributing
+We encourage contributions to the StackMob SDK. If you'd like to contribute, fork this repository, make your changes and submit a pull request with your changes.
 
 ## Copyright
 
