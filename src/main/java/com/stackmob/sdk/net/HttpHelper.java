@@ -40,7 +40,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 import com.stackmob.sdk.exception.StackMobException;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 
 public class HttpHelper {
     private static final int CONN_TIMEOUT = 20000;
@@ -173,7 +173,10 @@ public class HttpHelper {
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         //the following 2 lines use a deprecated Scheme constructor to maintain android compatability
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        SSLSocketFactory sslFactory = SSLSocketFactory.getSocketFactory();
+        sslFactory.setHostnameVerifier((X509HostnameVerifier) SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+        schemeRegistry.register(new Scheme("https", sslFactory, 443));
         return schemeRegistry;
     }
 

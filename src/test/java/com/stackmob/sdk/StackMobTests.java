@@ -72,6 +72,11 @@ public class StackMobTests {
         }
     }
 
+    //for capturing JSON errors with GSON
+    public class Error {
+        public String error;
+    }
+
     @Test
     public void testLoginShouldBeSucessful() {
         HashMap<String, Object> params = new HashMap<String, Object>();
@@ -101,7 +106,8 @@ public class StackMobTests {
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-                fail("Login shouldn't succeed when login credentials are wrong");
+                Error err = new Gson().fromJson(responseBody, Error.class);
+                assertNotNull(err.error);
             }
             @Override
             public void failure(StackMobException e) {
