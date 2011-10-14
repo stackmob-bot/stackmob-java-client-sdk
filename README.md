@@ -18,14 +18,14 @@ Hopefully you can see the pattern here. With this library, you can connect almos
 <dependency>
     <groupId>com.stackmob</groupId>
     <artifactId>stackmob-java-client-sdk</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
 ### With SBT
 
 ```scala
-libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.1"
+libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.3"
 ```
 
 ### Without Maven
