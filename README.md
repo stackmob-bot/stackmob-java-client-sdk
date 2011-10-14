@@ -28,7 +28,7 @@ Hopefully you can see the pattern here. With this library, you can connect almos
 libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.3"
 ```
 
-### Without Maven
+### Commandline
 
 [Download this JAR](http://search.maven.org/remotecontent?filepath=com/stackmob/stackmob-java-client-sdk/0.1.3/stackmob-java-client-sdk-0.1.3.jar) and put it on your CLASSPATH
 
