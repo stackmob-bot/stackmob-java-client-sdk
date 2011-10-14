@@ -17,23 +17,20 @@
 package com.stackmob.sdk.net;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
-import com.sun.org.apache.regexp.internal.RE;
+import com.stackmob.sdk.util.Pair;
+
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 import org.apache.http.*;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -152,7 +149,10 @@ public class HttpHelper {
         ensureHttpClient(sessionKey, sessionSecret, cb);
         try {
             mConsumer.sign(req);
-            HttpResponse response = mHttpClient.execute(req, new NoopResponseHandler());
+            Pair<HttpResponse, String> responsePair = mHttpClient.execute(req, new NoopResponseHandler());
+            HttpResponse response = responsePair.getFirst();
+
+
             if(HttpRedirectHelper.isRedirected(response)) {
                 HttpRequestBase oldReq = req;
                 HttpRequestBase newReq = HttpRedirectHelper.getRedirect(req, response);
@@ -161,7 +161,7 @@ public class HttpHelper {
                 return doRequest(newReq, sessionKey, sessionSecret, cb);
             }
             else {
-                return EntityUtils.toString(response.getEntity());
+                return responsePair.getSecond();
             }
         }
         catch (Throwable e) {

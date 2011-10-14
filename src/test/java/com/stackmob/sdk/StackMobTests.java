@@ -16,12 +16,8 @@
 
 package com.stackmob.sdk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -35,30 +31,44 @@ import com.stackmob.sdk.api.*;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
 import static com.stackmob.sdk.StackMobTestCommon.*;
+import static org.junit.Assert.*;
 
 public class StackMobTests {
     private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
 
-    public static class Game {
+    public class Game {
 
         //public for the benefit of Gson
         public List<String> players;
         public String game_id;
-        public long createdDate;
-        public long lastModDate;
+        public long createddate;
+        public long lastmoddate;
         public String name;
 
-        //for Gson deserialization
+        //this ctor is used for gson deserialization
         public Game(List<String> players, String gameId, long createdDate, long lastModDate, String name) {
           this(players, name);
           this.game_id = gameId;
-          this.createdDate = createdDate;
-          this.lastModDate = lastModDate;
+          this.createddate = createdDate;
+          this.lastmoddate = lastModDate;
         }
 
         public Game(List<String> players, String name) {
             this.players = players;
             this.name = name;
+        }
+
+        public void delete(StackMob stackmob) {
+            assertTrue(game_id != null);
+            stackmob.delete("game", game_id, new StackMobCallback() {
+                @Override
+                public void success(String responseBody) {}
+
+                @Override
+                public void failure(StackMobException e) {
+                    fail("attempted to delete game " + game_id + " but failed: " + e.getMessage());
+                }
+            });
         }
     }
 
@@ -187,6 +197,8 @@ public class StackMobTests {
 
     @Test
     public void testGetWithArguments() {
+        Game game = new Game(Arrays.asList("one", "two"), "one");
+        stackmob.post("game", game, EmptyCallback);
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
@@ -195,9 +207,10 @@ public class StackMobTests {
                 Type collectionType = new TypeToken<List<Game>>() {}.getType();
                 List<Game> games = gson.fromJson(responseBody, collectionType);
                 assertNotNull(games);
-                assertFalse(games.size() > 1);
+                assertTrue(games.size() >= 1);
                 Game game = games.get(0);
                 assertEquals("one", game.name);
+                game.delete(stackmob);
             }
             @Override
             public void failure(StackMobException e) {
@@ -218,7 +231,8 @@ public class StackMobTests {
                 Gson gson = new Gson();
                 Game game = gson.fromJson(responseBody, Game.class);
                 assertEquals("newGame", game.name);
-                }
+                game.delete(stackmob);
+            }
             @Override
             public void failure(StackMobException e) {
                 fail(e.getMessage());
@@ -260,7 +274,7 @@ public class StackMobTests {
     }
 
     @Test
-    public void testPutWithIdAndObjectRequest() {
+    public void testPUT() {
         final String oldName = "oldGameName";
         final String newName = "newGameName";
         Game game = new Game(new ArrayList<String>(), oldName);
@@ -277,6 +291,7 @@ public class StackMobTests {
                         Gson gson = new Gson();
                         Game game = gson.fromJson(responseBody, Game.class);
                         assertNotNull(game);
+                        assertNotNull(game.name);
                         assertEquals(newName, game.name);
                     }
                     @Override
@@ -284,6 +299,7 @@ public class StackMobTests {
                         fail(e.getMessage());
                     }
                 });
+                game.delete(stackmob);
             }
             @Override
             public void failure(StackMobException e) {
