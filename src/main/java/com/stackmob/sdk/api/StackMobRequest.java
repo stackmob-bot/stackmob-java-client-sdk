@@ -52,7 +52,7 @@ public class StackMobRequest {
 
     protected String methodName;
     protected String urlFormat = DEFAULT_URL_FORMAT;
-    protected Boolean isSecure = true;
+    protected Boolean isSecure = false;
     protected HttpVerb httpMethod = HttpVerb.GET;
     protected Map<String, Object> params;
     protected Object requestObject;

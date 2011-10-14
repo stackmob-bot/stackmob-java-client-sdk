@@ -17,12 +17,16 @@
 package com.stackmob.sdk.net;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
+import com.sun.org.apache.regexp.internal.RE;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 import org.apache.http.*;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -39,6 +43,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 import com.stackmob.sdk.exception.StackMobException;
+import org.apache.http.util.EntityUtils;
 
 public class HttpHelper {
     private static final int CONN_TIMEOUT = 20000;
@@ -89,10 +94,9 @@ public class HttpHelper {
         HttpParams httpParams = new BasicHttpParams();
         setConnectionParams(httpParams);
         SchemeRegistry schemeRegistry = registerFactories();
-        ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(schemeRegistry);
+        ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
 
         DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
-        client.setRedirectStrategy(new HttpRedirectStrategy(redirCB));
 
         mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
 
@@ -142,11 +146,23 @@ public class HttpHelper {
         return setHeaders(req, "Stackmob Android; " + apiVersionNum + "/" + appName);
     }
 
+    private static final int RedirectStatusCode = HttpStatus.SC_MOVED_TEMPORARILY;
+
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {
         ensureHttpClient(sessionKey, sessionSecret, cb);
         try {
             mConsumer.sign(req);
-            return mHttpClient.execute(req, new BasicResponseHandler());
+            HttpResponse response = mHttpClient.execute(req, new NoopResponseHandler());
+            if(HttpRedirectHelper.isRedirected(response)) {
+                HttpRequestBase oldReq = req;
+                HttpRequestBase newReq = HttpRedirectHelper.getRedirect(req, response);
+                cb.redirected(oldReq, response, newReq);
+                //DOES NOT protect against circular redirects
+                return doRequest(newReq, sessionKey, sessionSecret, cb);
+            }
+            else {
+                return EntityUtils.toString(response.getEntity());
+            }
         }
         catch (Throwable e) {
             throw new StackMobException(e.getMessage());
@@ -155,8 +171,9 @@ public class HttpHelper {
 
     private static SchemeRegistry registerFactories() {
         SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-        schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+        //the following 2 lines use a deprecated Scheme constructor to maintain android compatability
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
         return schemeRegistry;
     }
 

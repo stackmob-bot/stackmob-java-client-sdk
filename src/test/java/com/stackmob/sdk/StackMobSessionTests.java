@@ -22,14 +22,14 @@ import static org.junit.Assert.*;
 import com.stackmob.sdk.api.*;
 
 public class StackMobSessionTests {
-    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", "81573b21-b948-4339-baa3-dbffe0ca4503", "user", 0);
+    private StackMob stackmob = new StackMob(StackMobTestCommon.API_KEY, StackMobTestCommon.API_SECRET, StackMobTestCommon.USER_OBJECT_NAME, StackMobTestCommon.API_VERSION_NUM);
 
     @Test
     public void testSessionInitializedCorrectly() {
         StackMobSession session = stackmob.getSession();
-        assertEquals("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", session.getKey());
-        assertEquals("81573b21-b948-4339-baa3-dbffe0ca4503", session.getSecret());
-        assertEquals("user", session.getUserObjectName());
-        assertEquals(0, session.getApiVersionNumber());
+        assertEquals(StackMobTestCommon.API_KEY, session.getKey());
+        assertEquals(StackMobTestCommon.API_SECRET, session.getSecret());
+        assertEquals(StackMobTestCommon.USER_OBJECT_NAME, session.getUserObjectName());
+        assertEquals(StackMobTestCommon.API_VERSION_NUM, new Integer(session.getApiVersionNumber()));
     }
 }

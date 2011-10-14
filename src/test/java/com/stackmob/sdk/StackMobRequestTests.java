@@ -30,6 +30,8 @@ import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
 import com.stackmob.sdk.net.HttpVerb;
 
+import static com.stackmob.sdk.StackMobTestCommon.*;
+
 public class StackMobRequestTests {
     private StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
       @Override
@@ -38,7 +40,7 @@ public class StackMobRequestTests {
       }
     };
 
-    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", "81573b21-b948-4339-baa3-dbffe0ca4503", "user", 0);
+    private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
     private StackMobSession session = stackmob.getSession();
 
     @Test

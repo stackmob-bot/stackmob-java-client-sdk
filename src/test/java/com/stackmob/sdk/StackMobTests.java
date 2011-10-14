@@ -34,9 +34,10 @@ import com.google.gson.reflect.TypeToken;
 import com.stackmob.sdk.api.*;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
+import static com.stackmob.sdk.StackMobTestCommon.*;
 
 public class StackMobTests {
-    private StackMob stackmob = new StackMob("7f1aebc7-0fb8-4265-bfea-2c42c08a3bf0", "81573b21-b948-4339-baa3-dbffe0ca4503", "user", 0);
+    private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
 
     public static class Game {
 
@@ -59,11 +60,6 @@ public class StackMobTests {
             this.players = players;
             this.name = name;
         }
-    }
-
-    @Test
-    public void testSingleton() {
-        assertNotNull(stackmob);
     }
 
     @Test

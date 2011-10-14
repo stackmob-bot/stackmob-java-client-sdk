@@ -23,10 +23,12 @@ import java.util.Map;
 public class StackMobUserBasedRequest extends StackMobRequest {
     public StackMobUserBasedRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
         super(session, method, callback, redirCB);
+        isSecure = true;
     }
 
     public StackMobUserBasedRequest(StackMobSession session, String method, Map<String, Object> params, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
         super(session, method, params, callback, redirCB);
+        isSecure = true;
     }
 
     @Override
