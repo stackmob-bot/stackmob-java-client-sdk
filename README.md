@@ -64,7 +64,7 @@ class MyObject {
 MyObject object = new MyObject("test object");
 
 //create an object
-stackmob.post("MyObject", object, new StackMobCallback() {
+stackmob.post("myobject", object, new StackMobCallback() {
     @Override
     public void success(String responseBody) {
         //handle the successul set
