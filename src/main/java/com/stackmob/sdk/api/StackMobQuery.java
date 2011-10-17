@@ -145,6 +145,17 @@ public class StackMobQuery {
         return putInMap(field, Operator.GTE, val);
     }
 
+    /**
+     * set the expand depth of this query. the expand depth instructs the StackMob platform to detect relationships and automatically replace those
+     * relationship IDs with the values that they point to.
+     * @param i the expand depth. at time of writing, StackMob restricts expand depth to maximum 3
+     * @return the new query that resulted from adding this operation
+     */
+    public StackMobQuery expandDepthIs(Integer i) {
+        args.put("_expand", i.toString());
+        return this;
+    }
+
     private StackMobQuery putInMap(String field, Operator operator, String value) {
         args.put(field+operator.getOperatorForURL(), value);
         return this;
