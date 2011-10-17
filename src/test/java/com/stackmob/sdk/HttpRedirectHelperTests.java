@@ -35,7 +35,7 @@ import org.apache.http.entity.BasicHttpEntity;
 
 import static org.junit.Assert.*;
 
-public class HttpRedirectHelperTests {
+public class HttpRedirectHelperTests extends StackMobTestCommon {
 
     private static final String RedirectedLoc = "http://redirected.com";
     private static final ProtocolVersion protocolVer = new ProtocolVersion("http", 1, 1);

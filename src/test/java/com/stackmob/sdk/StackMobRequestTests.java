@@ -30,9 +30,7 @@ import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
 import com.stackmob.sdk.net.HttpVerb;
 
-import static com.stackmob.sdk.StackMobTestCommon.*;
-
-public class StackMobRequestTests {
+public class StackMobRequestTests extends StackMobTestCommon {
     private StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
       @Override
       public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {

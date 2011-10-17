@@ -18,6 +18,7 @@ package com.stackmob.sdk;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -30,11 +31,9 @@ import com.google.gson.reflect.TypeToken;
 import com.stackmob.sdk.api.*;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
-import static com.stackmob.sdk.StackMobTestCommon.*;
 import static org.junit.Assert.*;
 
-public class StackMobTests {
-    private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
+public class StackMobTests extends StackMobTestCommon {
 
     public class Game {
 
@@ -79,7 +78,7 @@ public class StackMobTests {
 
     @Test
     public void testLoginShouldBeSucessful() {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("username", "admin");
         params.put("password", "1234");
 
@@ -99,7 +98,7 @@ public class StackMobTests {
 
     @Test
     public void testLoginShouldFail() {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("username", "idonotexist");
         params.put("password", "ghost");
 
@@ -120,7 +119,7 @@ public class StackMobTests {
 
     @Test
     public void testLogoutShouldBeSucessful() {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("username", "admin");
         params.put("password", "1234");
 
@@ -173,6 +172,7 @@ public class StackMobTests {
                 System.out.println("endsession: " + responseBody);
                 assertNotNull(responseBody);
             }
+
             @Override
             public void failure(StackMobException e) {
                 fail(e.getMessage());
@@ -182,6 +182,8 @@ public class StackMobTests {
 
     @Test
     public void testGetWithoutArguments() {
+        Game game = new Game(Arrays.asList("one", "two"), "one");
+        stackmob.post("game", game, EmptyCallback);
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
@@ -201,6 +203,14 @@ public class StackMobTests {
         stackmob.get("game", callback);
     }
 
+    private List<Game> getGamesFromJSON(String json) {
+        assertNotNull(json);
+        Type collectionType = new TypeToken<List<Game>>() {}.getType();
+        List<Game> games = new Gson().fromJson(json, collectionType);
+        assertNotNull(games);
+        return games;
+    }
+
     @Test
     public void testGetWithArguments() {
         Game game = new Game(Arrays.asList("one", "two"), "one");
@@ -208,11 +218,7 @@ public class StackMobTests {
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-                assertNotNull(responseBody);
-                Gson gson = new Gson();
-                Type collectionType = new TypeToken<List<Game>>() {}.getType();
-                List<Game> games = gson.fromJson(responseBody, collectionType);
-                assertNotNull(games);
+                List<Game> games = getGamesFromJSON(responseBody);
                 assertTrue(games.size() >= 1);
                 Game game = games.get(0);
                 assertEquals("one", game.name);
@@ -224,9 +230,34 @@ public class StackMobTests {
             }
         };
 
-        HashMap<String, Object> arguments = new HashMap<String, Object>();
+        Map<String, String> arguments = new HashMap<String, String>();
         arguments.put("name", "one");
         stackmob.get("game", arguments, callback);
+    }
+
+    @Test
+    public void testGetWithQuery() {
+        Long creationTime = System.currentTimeMillis();
+        Game game = new Game(Arrays.asList("one", "two"), "one");
+        stackmob.post("game", game, EmptyCallback);
+        StackMobCallback callback = new StackMobCallback() {
+            @Override
+            public void success(String responseBody) {
+                List<Game> games = getGamesFromJSON(responseBody);
+                assertTrue(games.size() >= 1);
+                for(Game game: games) {
+                    game.delete(stackmob);
+                }
+            }
+
+            @Override
+            public void failure(StackMobException e) {
+                fail(e.getMessage());
+            }
+        };
+
+        StackMobQuery q = new StackMobQuery("game").field("lastmoddate").isGreaterThanOrEqualTo(creationTime).getQuery();
+        stackmob.get(q, callback);
     }
 
     @Test

@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 
 import com.stackmob.sdk.api.*;
 
-public class StackMobSessionTests {
+public class StackMobSessionTests extends StackMobTestCommon {
     private StackMob stackmob = new StackMob(StackMobTestCommon.API_KEY, StackMobTestCommon.API_SECRET, StackMobTestCommon.USER_OBJECT_NAME, StackMobTestCommon.API_VERSION_NUM);
 
     @Test

@@ -40,7 +40,6 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 import com.stackmob.sdk.exception.StackMobException;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 
 public class HttpHelper {
     private static final int CONN_TIMEOUT = 20000;
@@ -143,8 +142,6 @@ public class HttpHelper {
         return setHeaders(req, "Stackmob Android; " + apiVersionNum + "/" + appName);
     }
 
-    private static final int RedirectStatusCode = HttpStatus.SC_MOVED_TEMPORARILY;
-
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {
         ensureHttpClient(sessionKey, sessionSecret, cb);
         try {
@@ -174,7 +171,7 @@ public class HttpHelper {
         //the following 2 lines use a deprecated Scheme constructor to maintain android compatability
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         SSLSocketFactory sslFactory = SSLSocketFactory.getSocketFactory();
-        sslFactory.setHostnameVerifier((X509HostnameVerifier) SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        sslFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
         schemeRegistry.register(new Scheme("https", sslFactory, 443));
         return schemeRegistry;

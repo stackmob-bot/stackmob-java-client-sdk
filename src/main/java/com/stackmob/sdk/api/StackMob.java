@@ -128,7 +128,7 @@ public class StackMob {
      * @param params parameters to pass to the login method
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
-    public void login(Map<String, Object> params, StackMobCallback callback) {
+    public void login(Map<String, String> params, StackMobCallback callback) {
         new StackMobUserBasedRequest(session, "login", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
@@ -163,7 +163,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void twitterLogin(String token, String secret, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
         new StackMobUserBasedRequest(this.session, "twitterlogin", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -175,7 +175,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void twitterStatusUpdate(String message, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_st", message);
         new StackMobUserBasedRequest(this.session, "twitterStatusUpdate", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
@@ -188,7 +188,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void registerWithTwitterToken(String token, String secret, String username, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
         params.put("username", username);
@@ -202,7 +202,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void linkUserWithTwitterToken(String token, String secret, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
 
@@ -215,7 +215,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void facebookLogin(String token, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
 
         new StackMobUserBasedRequest(this.session, "facebookLogin", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -228,7 +228,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void registerWithFacebookToken(String token, String username, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
         params.put("username", username);
 
@@ -241,7 +241,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
     public void linkUserWithFacebookToken(String token, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
 
         new StackMobUserBasedRequest(this.session, "linkUserWithFacebook", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -253,7 +253,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may happen in a separate thread. will not post to FB and will return nothing if there is no user logged into FB
      */
     public void facebookPostMessage(String msg, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("message", msg);
 
         new StackMobUserBasedRequest(this.session, "postFacebookMessage", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -293,8 +293,16 @@ public class StackMob {
      * @param arguments arguments to be encoded into the query string of the get request
      * @param callback callback to be called when the server returns. may happen in a separate thread
      */
-    public void get(String path, Map<String, Object> arguments, StackMobCallback callback) {
+    public void get(String path, Map<String, String> arguments, StackMobCallback callback) {
         new StackMobRequest(this.session, path, arguments, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
+    }
+
+    public void get(StackMobQuery query, StackMobCallback callback) {
+        this.get("/"+query.getObjectName(), query.getArguments(), callback);
+    }
+
+    public void get(StackMobQueryWithField query, StackMobCallback callback) {
+        this.get(query.getQuery(), callback);
     }
 
     /**

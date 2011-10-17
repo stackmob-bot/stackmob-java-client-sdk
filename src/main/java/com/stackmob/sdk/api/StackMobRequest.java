@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
+import oauth.signpost.OAuth;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -54,7 +55,7 @@ public class StackMobRequest {
     protected String urlFormat = DEFAULT_URL_FORMAT;
     protected Boolean isSecure = false;
     protected HttpVerb httpMethod = HttpVerb.GET;
-    protected Map<String, Object> params;
+    protected Map<String, String> params;
     protected Object requestObject;
 
     //default to doing nothing
@@ -79,7 +80,7 @@ public class StackMobRequest {
         this.callback = callback;
     }
 
-    public StackMobRequest(StackMobSession session, String method, Map<String, Object> args, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+    public StackMobRequest(StackMobSession session, String method, Map<String, String> args, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
         this(session, method, callback, redirCB);
         this.params = args;
     }
@@ -127,6 +128,19 @@ public class StackMobRequest {
         }
     }
 
+    private String formatQueryString(List<NameValuePair> nameValuePairs) {
+        //return URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
+        String ret = URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
+        return ret.replace("%5B", "[").replace("%5D", "]");//replace is a hack to make sure that the encoder does not encode [ or ]
+        /*
+        String url = "";
+        for(NameValuePair nameValuePair : nameValuePairs) {
+            url = OAuth.addQueryParameters(url, nameValuePair.getName(), nameValuePair.getValue());
+        }
+        return url.substring(1);
+        */
+    }
+
     private String sendGetRequest() throws StackMobException {
         URI uri;
         String ret;
@@ -134,7 +148,7 @@ public class StackMobRequest {
         try {
             String query = null;
             if (null != params) {
-                query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
+                query = formatQueryString(getParamsForRequest());
             }
 
             uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
@@ -243,7 +257,12 @@ public class StackMobRequest {
     }
 
     protected String getPath() {
-        return "/" + methodName;
+        if(methodName.startsWith("/")) {
+            return methodName;
+        }
+        else {
+            return "/" + methodName;
+        }
     }
 
     private String getScheme() {
@@ -266,7 +285,7 @@ public class StackMobRequest {
 
         List<NameValuePair> ret = new ArrayList<NameValuePair>(params.size());
         for (String key : params.keySet()) {
-            ret.add(new BasicNameValuePair(key, params.get(key).toString()));
+            ret.add(new BasicNameValuePair(key, params.get(key)));
         }
 
         return ret;
