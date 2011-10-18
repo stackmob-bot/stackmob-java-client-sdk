@@ -4,7 +4,7 @@ With the StackMob Java Client SDK, you can integrate StackMob into any Java / JV
 
 Here are some example usages:
 
-* Connect your Android app to your StackMob app (there is also an [Android SDK](https://github.com/stackmob/Stackmob_Android) that provides Android specific functionality)
+* Connect your Android app to your StackMob app (there is also an [Android SDK](https://github.com/stackmob/Stackmob_Android) that provides additional Android specific functionality)
 * Connect your Java command line utility to your StackMob app
 * Connect your Tomcat, JBoss, etc... app to your StackMob app
 
@@ -28,10 +28,9 @@ Hopefully you can see the pattern here. With this library, you can connect almos
 libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.3"
 ```
 
-### Without Maven
+### Commandline
 
-[Download this JAR](http://search.maven.org/remotecontent?filepath=com/stackmob/stackmob-java-client-sdk/0.1.3/stackmob-java-client-sdk-0.1.3.jar).
-2. put it in your Java CLASSPATH
+[Download this JAR](http://search.maven.org/remotecontent?filepath=com/stackmob/stackmob-java-client-sdk/0.1.3/stackmob-java-client-sdk-0.1.3.jar) and put it on your CLASSPATH
 
 ## Coding
 
@@ -65,7 +64,7 @@ class MyObject {
 MyObject object = new MyObject("test object");
 
 //create an object
-stackmob.post("MyObject", object, new StackMobCallback() {
+stackmob.post("myobject", object, new StackMobCallback() {
     @Override
     public void success(String responseBody) {
         //handle the successul set
