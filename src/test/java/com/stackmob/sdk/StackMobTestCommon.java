@@ -31,8 +31,8 @@ import java.lang.reflect.Modifier;
 import static org.junit.Assert.*;
 
 public class StackMobTestCommon {
-    public static final String API_KEY = "cd2c9ccd-bd89-48e7-85b8-34ff9bebd3b0";
-    public static final String API_SECRET = "ae3078d5-f7fa-4d32-8e0f-6f342830e08c";
+    public static final String API_KEY = "YOUR_API_KEY_HERE";
+    public static final String API_SECRET = "YOUR_API_SECRET_HERE";
     public static final String USER_OBJECT_NAME = "user";
     public static final Integer API_VERSION_NUM = 0;
     public static final Long MAX_LATCH_WAIT_TIME_MS = 2000L;
