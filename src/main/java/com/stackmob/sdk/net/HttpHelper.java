@@ -120,7 +120,7 @@ public class HttpHelper {
     }
 
     private static <T extends HttpRequestBase> T setHeaders(T req, Integer apiVersionNum) {
-        return setHeaders(req, "Stackmob Android; " + apiVersionNum);
+        return setHeaders(req, "Stackmob Java Client; " + apiVersionNum);
     }
 
     private static <T extends HttpEntityEnclosingRequestBase> T setHeaders(T req, String appName, Integer apiVersionNum, HttpEntity entity) {
@@ -140,7 +140,7 @@ public class HttpHelper {
     }
 
     private static <T extends HttpRequestBase> T setHeaders(T req, String appName, Integer apiVersionNum) {
-        return setHeaders(req, "Stackmob Android; " + apiVersionNum + "/" + appName);
+        return setHeaders(req, "Stackmob Java Client; " + apiVersionNum + "/" + appName);
     }
 
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {
