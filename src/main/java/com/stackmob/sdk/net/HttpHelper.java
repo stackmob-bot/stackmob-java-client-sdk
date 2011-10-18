@@ -69,7 +69,7 @@ public class HttpHelper {
 
     //PUT
     public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, Integer apiVersionNum, StackMobRedirectedCallback cb) throws StackMobException {
-        return doRequest(setHeaders(new HttpPut(uri), apiVersionNum), sessionKey, sessionSecret, cb);
+        return doRequest(setHeaders(new HttpPut(uri), apiVersionNum, entity), sessionKey, sessionSecret, cb);
     }
 
     public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, String appName, Integer apiVersionNum, StackMobRedirectedCallback cb)
@@ -119,7 +119,7 @@ public class HttpHelper {
     }
 
     private static <T extends HttpRequestBase> T setHeaders(T req, Integer apiVersionNum) {
-        return setHeaders(req, "Stackmob Android; " + apiVersionNum);
+        return setHeaders(req, "Stackmob Java Client; " + apiVersionNum);
     }
 
     private static <T extends HttpEntityEnclosingRequestBase> T setHeaders(T req, String appName, Integer apiVersionNum, HttpEntity entity) {
@@ -139,7 +139,7 @@ public class HttpHelper {
     }
 
     private static <T extends HttpRequestBase> T setHeaders(T req, String appName, Integer apiVersionNum) {
-        return setHeaders(req, "Stackmob Android; " + apiVersionNum + "/" + appName);
+        return setHeaders(req, "Stackmob Java Client; " + apiVersionNum + "/" + appName);
     }
 
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {

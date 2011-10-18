@@ -16,7 +16,6 @@
 
 package com.stackmob.sdk;
 
-import com.stackmob.sdk.api.StackMob;
 import com.stackmob.sdk.api.StackMobRequest;
 import com.stackmob.sdk.api.StackMobSession;
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
@@ -38,7 +37,6 @@ public class StackMobRequestTests extends StackMobTestCommon {
       }
     };
 
-    private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
     private StackMobSession session = stackmob.getSession();
 
     @Test

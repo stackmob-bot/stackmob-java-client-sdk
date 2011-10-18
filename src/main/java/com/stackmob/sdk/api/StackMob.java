@@ -20,11 +20,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.net.HttpVerb;
 import com.stackmob.sdk.net.HttpHelper;
+import com.stackmob.sdk.push.StackMobPushToken;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 
@@ -123,10 +125,14 @@ public class StackMob {
         this.urlFormat = urlFormat;
     }
 
+    ////////////////////
+    //session & login/logout
+    ////////////////////
+
     /**
      * call the login method on StackMob
      * @param params parameters to pass to the login method
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void login(Map<String, String> params, StackMobCallback callback) {
         new StackMobUserBasedRequest(session, "login", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -134,7 +140,7 @@ public class StackMob {
 
     /**
      * call the logout method on StackMob
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void logout(StackMobCallback callback) {
         new StackMobUserBasedRequest(this.session, "logout", callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -150,17 +156,21 @@ public class StackMob {
 
     /**
      * call the endsession method on stackmob
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void endSession(StackMobCallback callback) {
         new StackMobRequest(this.session, "endsession", HttpVerb.POST, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
+    ////////////////////
+    //social
+    ////////////////////
+
     /**
      * call the twitterlogin method on stackmob
      * @param token the twitter session key (this is a per user key - different from the consumer key)
      * @param secret the twitter session secret (this is a per user secret - different from the consumer secret)
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void twitterLogin(String token, String secret, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -172,7 +182,7 @@ public class StackMob {
     /**
      * call the twitterStatusUpdate method on StackMob
      * @param message the message to send. must be <= 140 characters
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void twitterStatusUpdate(String message, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -185,7 +195,7 @@ public class StackMob {
      * @param token the twitter session key (this is a per user key - different from the consumer key)
      * @param secret the twitter session secret (this is a per user secret - different from the consumer secret)
      * @param username the username that the user should have
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void registerWithTwitterToken(String token, String secret, String username, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -199,7 +209,7 @@ public class StackMob {
      * link an existing stackmob user with an existing twitter user
      * @param token the twitter session key (this is a per user key - different from the consumer key)
      * @param secret the twitter session secret (this is a per user secret - different from the consumer secret)
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void linkUserWithTwitterToken(String token, String secret, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -212,7 +222,7 @@ public class StackMob {
     /**
      * login into facebook on the StackMob platform
      * @param token the facebook user token
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void facebookLogin(String token, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -225,7 +235,7 @@ public class StackMob {
      * create a new StackMob user and link that user with a facebook account
      * @param token the facebook user token
      * @param username the StackMob username that the new user should have
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void registerWithFacebookToken(String token, String username, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -238,7 +248,7 @@ public class StackMob {
     /**
      * link an existing StackMob user with a Facebook user
      * @param token the Facebook user token
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void linkUserWithFacebookToken(String token, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -248,9 +258,9 @@ public class StackMob {
     }
 
     /**
-     * post a message to facebook
+     * post a message to facebook. this method will not post to FB and will return nothing if there is no user logged into FB
      * @param msg the message to post
-     * @param callback callback to be called when the server returns. may happen in a separate thread. will not post to FB and will return nothing if there is no user logged into FB
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void facebookPostMessage(String msg, StackMobCallback callback) {
         Map<String, String> params = new HashMap<String, String>();
@@ -260,28 +270,116 @@ public class StackMob {
     }
 
     /**
-     * get facebook user info for the current user
-     * @param callback callback to be called when the server returns. may happen in a separate thread. will return nothing if there is no currently logged in FB user
+     * get facebook user info for the current user. this method will return nothing if there is no currently logged in FB user
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void getFacebookUserInfo(StackMobCallback callback) {
         get("getFacebookUserInfo", callback);
+    }
+
+    ////////////////////
+    //Push Notifications
+    ////////////////////
+
+    /**
+     * send a push notification to a group of tokens
+     * @param payload the payload of the push notification to send
+     * @param tokens the tokens to which to send
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void pushToTokens(Map<String, String> payload, List<StackMobPushToken> tokens, StackMobCallback callback) {
+        Map<String, Object> finalPayload = new HashMap<String, Object>();
+        Map<String, Object> payloadMap = new HashMap<String, Object>();
+        payloadMap.put("kvPairs", payload);
+        finalPayload.put("payload", payloadMap);
+        finalPayload.put("tokens", tokens);
+
+        post("push/push_tokens_universal", finalPayload, callback);
+    }
+
+    /**
+     * send a push notification to a group of users.
+     * @param payload the payload to send
+     * @param userIds the IDs of the users to which to send
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void pushToUsers(Map<String, String> payload, List<String> userIds, StackMobCallback callback) {
+        Map<String, Object> finalPayload = new HashMap<String, Object>();
+        finalPayload.put("kvPairs", payload);
+        finalPayload.put("userIds", userIds);
+        post("push/push_users_universal", finalPayload, callback);
     }
 
     /**
      * register a user for C2DM push notifications
      * @param username the StackMob username to register
      * @param registrationID the C2DM registration ID. see http://code.google.com/android/c2dm/#registering for detail on how to get this ID
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void registerForPushWithUser(String username, String registrationID, StackMobCallback callback) {
         RegistrationIDAndUser tokenAndUser = new RegistrationIDAndUser(registrationID, username);
-        post("/push/register_device_token_universal", tokenAndUser, callback);
+        post("push/register_device_token_universal", tokenAndUser, callback);
     }
+
+    /**
+     * broadcast a push notification to all users of this app. use this method sparingly, especially if you have a large app
+     * @param payload the payload to broadcast
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void broadcastPushNotification(Map<String, String> payload, StackMobCallback callback) {
+        Map<String, Object> finalPayload = new HashMap<String, Object>();
+        finalPayload.put("kvPairs", payload);
+        post("push/push_broadcast", finalPayload, callback);
+    }
+
+    /**
+     * get all expired push tokens for this app.
+     * @param clear whether or not to clear the tokens after they've been returned
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    private void getExpiredPushTokens(Boolean clear, StackMobCallback callback) {
+        Map<String, Object> finalPayload = new HashMap<String, Object>();
+        finalPayload.put("clear", clear);
+        post("push/get_expired_tokens_universal", finalPayload, callback);
+    }
+
+    /**
+     * get all expired push tokens for this app, and clear them after they've been returned
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void getAndClearExpiredPushTokens(StackMobCallback callback) {
+        getExpiredPushTokens(true, callback);
+    }
+
+    /**
+     * get expired push tokens, but do not clear them after they've been returned
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void getExpiredPushTokens(StackMobCallback callback) {
+        getExpiredPushTokens(false, callback);
+    }
+
+    /**
+     * remove a push token for this app
+     * @param tokenString the token value
+     * @param tokenType the type of the token
+     * @param callback callback to be called when the server returns. may execute in a separate thread
+     */
+    public void removePushToken(String tokenString, StackMobPushToken.TokenType tokenType, StackMobCallback callback) {
+        Map<String, Object> finalPayload = new HashMap<String, Object>();
+        finalPayload.put("token", tokenString);
+        finalPayload.put("type", tokenType.toString());
+        post("push/remove_push_token_universal", finalPayload, callback);
+    }
+
+    ////////////////////
+    //GET/PUSH/POST/DELETE
+    ////////////////////
 
     /**
      * do a get request on the StackMob platform
      * @param path the path to get
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void get(String path, StackMobCallback callback) {
         new StackMobRequest(this.session, path, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -291,7 +389,7 @@ public class StackMob {
      * do a get request on the StackMob platform
      * @param path the path to get
      * @param arguments arguments to be encoded into the query string of the get request
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void get(String path, Map<String, String> arguments, StackMobCallback callback) {
         new StackMobRequest(this.session, path, arguments, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -309,7 +407,7 @@ public class StackMob {
      * do a post request on the StackMob platform
      * @param path the path to get
      * @param requestObject the object to serialize and send in the POST body. this object will be serialized with Gson
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void post(String path, Object requestObject, StackMobCallback callback) {
         new StackMobRequest(this.session, path, HttpVerb.POST, requestObject, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -320,7 +418,7 @@ public class StackMob {
      * @param path the path to put
      * @param id the id of the object to put
      * @param requestObject the object to serialize and send in the PUT body. this object will be serialized with Gson
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void put(String path, String id, Object requestObject, StackMobCallback callback) {
         new StackMobRequest(this.session, path + "/" + id, HttpVerb.PUT, requestObject, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -330,7 +428,7 @@ public class StackMob {
      * do a delete request to the stackmob platform
      * @param path the path to delete
      * @param id the id of the object to put
-     * @param callback callback to be called when the server returns. may happen in a separate thread
+     * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void delete(String path, String id, StackMobCallback callback) {
         new StackMobRequest(this.session, path + "/" + id, HttpVerb.DELETE, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
