@@ -32,7 +32,7 @@ import com.stackmob.sdk.net.HttpVerb;
 
 import static com.stackmob.sdk.StackMobTestCommon.*;
 
-public class StackMobRequestTests {
+public class StackMobRequestTests extends StackMobTestCommon {
     private StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
       @Override
       public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {
@@ -40,7 +40,6 @@ public class StackMobRequestTests {
       }
     };
 
-    private StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
     private StackMobSession session = stackmob.getSession();
 
     @Test

@@ -70,7 +70,7 @@ public class HttpHelper {
 
     //PUT
     public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, Integer apiVersionNum, StackMobRedirectedCallback cb) throws StackMobException {
-        return doRequest(setHeaders(new HttpPut(uri), apiVersionNum), sessionKey, sessionSecret, cb);
+        return doRequest(setHeaders(new HttpPut(uri), apiVersionNum, entity), sessionKey, sessionSecret, cb);
     }
 
     public static String doPut(URI uri, HttpEntity entity, String sessionKey, String sessionSecret, String appName, Integer apiVersionNum, StackMobRedirectedCallback cb)
@@ -142,8 +142,6 @@ public class HttpHelper {
     private static <T extends HttpRequestBase> T setHeaders(T req, String appName, Integer apiVersionNum) {
         return setHeaders(req, "Stackmob Android; " + apiVersionNum + "/" + appName);
     }
-
-    private static final int RedirectStatusCode = HttpStatus.SC_MOVED_TEMPORARILY;
 
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {
         ensureHttpClient(sessionKey, sessionSecret, cb);

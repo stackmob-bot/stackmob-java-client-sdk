@@ -17,13 +17,19 @@
 package com.stackmob.sdk.api;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.GsonBuilder;
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
+import com.stackmob.sdk.push.StackMobPushToken;
+import com.stackmob.sdk.push.StackMobPushTokenDeserializer;
+import com.stackmob.sdk.push.StackMobPushTokenSerializer;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -57,6 +63,8 @@ public class StackMobRequest {
     protected Map<String, Object> params;
     protected Object requestObject;
 
+    protected Gson gson;
+
     //default to doing nothing
     protected StackMobCallback callback = new StackMobCallback() {
         @Override
@@ -72,6 +80,12 @@ public class StackMobRequest {
         this.sessionSecret = session.getSecret();
         this.methodName = method;
         this.redirectedCallback = cb;
+
+        GsonBuilder gsonBuilder = new GsonBuilder()
+                                  .registerTypeAdapter(StackMobPushToken.class, new StackMobPushTokenDeserializer())
+                                  .registerTypeAdapter(StackMobPushToken.class, new StackMobPushTokenSerializer())
+                                  .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.TRANSIENT, Modifier.STATIC);
+        gson = gsonBuilder.create();
     }
 
     public StackMobRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
@@ -94,6 +108,8 @@ public class StackMobRequest {
         this.methodName = method;
         this.httpMethod = verb;
     }
+
+
 
     public StackMobRequest setUrlFormat(String urlFmt) {
         this.urlFormat = urlFmt;
@@ -164,7 +180,6 @@ public class StackMobRequest {
                 entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
             }
             else if (null != requestObject) {
-                Gson gson = new Gson();
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
 
@@ -197,7 +212,6 @@ public class StackMobRequest {
                 entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
             }
             else if (null != requestObject) {
-                Gson gson = new Gson();
                 entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
             }
             if(session.getAppName() != null) {
