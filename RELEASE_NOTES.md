@@ -1,5 +1,8 @@
 # Stackmob Java SDK (Release Notes)
 
+### 0.1.4 (10/17/2011)
+* StackMob Push REST API support
+
 ### 0.1.3 (10/13/2011)
 * Android compatability fixes
 * Fixed SSL hostname verification issues for HTTPS

@@ -77,7 +77,7 @@ stackmob.post("myobject", object, new StackMobCallback() {
 ```
 
 Once you have it, you can use the StackMob object to execute a wide range of operations against your app on StackMob's servers. Check out the
-[javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.1/apidocs/) for more.
+[javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.4/apidocs/) for more.
 
 ## Issues
 We use Github to track issues with the SDK. If you find any issues, please report them [here](https://github.com/stackmob/stackmob-java-client-sdk/issues), and include as many details as possible about the issue you encountered.
