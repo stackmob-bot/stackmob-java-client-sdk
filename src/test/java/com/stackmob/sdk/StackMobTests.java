@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.stackmob.sdk.api.StackMobQuery;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -165,6 +166,29 @@ public class StackMobTests extends StackMobTestCommon {
                 assertNotNull(games);
                 assertTrue(games.size() >= 1);
                 assertEquals("one", games.get(0).name);
+                games.get(0).delete(stackmob);
+            }
+            @Override
+            public void failure(StackMobException e) {
+                fail(e.getMessage());
+            }
+        });
+    }
+
+    @Test
+    public void testGetQuery() throws Exception {
+        StackMobObject.create(stackmob, new Game(Arrays.asList("seven", "six"), "woot"), Game.class);
+
+        StackMobQuery query = new StackMobQuery("game").fieldIsGreaterThanOrEqualTo("name", "sup");
+        stackmob.get(query, new StackMobCallback() {
+            @Override
+            public void success(String responseBody) {
+                assertNotNull(responseBody);
+                Type collectionType = new TypeToken<List<Game>>() {}.getType();
+                List<Game> games = gson.fromJson(responseBody, collectionType);
+                assertNotNull(games);
+                assertTrue(games.size() >= 1);
+                assertEquals("woot", games.get(0).name);
                 games.get(0).delete(stackmob);
             }
             @Override
