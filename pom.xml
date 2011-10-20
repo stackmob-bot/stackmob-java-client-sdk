@@ -128,16 +128,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>oauth.signpost</groupId>
-            <artifactId>signpost-core</artifactId>
-            <version>1.2.1.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-        <groupId>oauth.signpost</groupId>
-            <artifactId>signpost-commonshttp4</artifactId>
-            <version>1.2.1.1</version>
-            <scope>compile</scope>
+            <groupId>org.scribe</groupId>
+            <artifactId>scribe</artifactId>
+            <version>1.2.3</version>
         </dependency>
 
     </dependencies>

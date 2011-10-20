@@ -16,13 +16,15 @@
 
 package com.stackmob.sdk.net;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import com.stackmob.sdk.util.Pair;
 
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+//import oauth.signpost.OAuthConsumer;
+//import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
@@ -40,13 +42,23 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 import com.stackmob.sdk.exception.StackMobException;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.DefaultApi10a;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
+import sun.misc.IOUtils;
+
+import javax.xml.ws.Response;
 
 public class HttpHelper {
     private static final int CONN_TIMEOUT = 20000;
     private static final String DEFAULT_CONTENT_TYPE_FMT = "application/vnd.stackmob+json; version=%d";
     private static String DEFAULT_CONTENT_TYPE;
     private static DefaultHttpClient mHttpClient;
-    private static OAuthConsumer mConsumer;
+//    private static OAuthConsumer mConsumer;
+    private static OAuthService oAuthService;
 
     //GET
     public static String doGet(URI uri, String sessionKey, String sessionSecret, Integer apiVersionNum, StackMobRedirectedCallback cb) throws StackMobException {
@@ -94,7 +106,12 @@ public class HttpHelper {
 
         DefaultHttpClient client = new DefaultHttpClient(clientConnectionManager, httpParams);
 
-        mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
+//        mConsumer = new CommonsHttpOAuthConsumer(sessionKey, sessionSecret);
+        oAuthService = new ServiceBuilder()
+                           .provider(StackMobApi.class)
+                           .apiKey(sessionKey)
+                           .apiSecret(sessionSecret)
+                           .build();
 
         return client;
     }
@@ -145,21 +162,36 @@ public class HttpHelper {
     private static String doRequest(HttpRequestBase req, String sessionKey, String sessionSecret, StackMobRedirectedCallback cb) throws StackMobException {
         ensureHttpClient(sessionKey, sessionSecret, cb);
         try {
-            mConsumer.sign(req);
-            Pair<HttpResponse, String> responsePair = mHttpClient.execute(req, new NoopResponseHandler());
-            HttpResponse response = responsePair.getFirst();
-
-
-            if(HttpRedirectHelper.isRedirected(response)) {
-                HttpRequestBase oldReq = req;
-                HttpRequestBase newReq = HttpRedirectHelper.getRedirect(req, response);
-                cb.redirected(oldReq, response, newReq);
-                //DOES NOT protect against circular redirects
-                return doRequest(newReq, sessionKey, sessionSecret, cb);
+//            mConsumer.sign(req);
+            OAuthRequest oReq = new OAuthRequest(Verb.valueOf(req.getMethod()), req.getURI().toString());
+            for ( Header h : req.getAllHeaders() ) {
+                oReq.addHeader(h.getName(), h.getValue());
             }
-            else {
-                return responsePair.getSecond();
+            if ( req instanceof HttpEntityEnclosingRequestBase) {
+                HttpEntity e = ((HttpEntityEnclosingRequestBase) req).getEntity();
+                if ( e != null ) {
+                    oReq.addPayload(IOUtils.readFully(e.getContent(), -1, true));
+                }
             }
+
+            oAuthService.signRequest(new Token("", ""), oReq);
+            org.scribe.model.Response resp = oReq.send();
+
+            return resp.getBody();
+//            Pair<HttpResponse, String> responsePair = mHttpClient.execute(req, new NoopResponseHandler());
+//            HttpResponse response = responsePair.getFirst();
+//
+//
+//            if(HttpRedirectHelper.isRedirected(response)) {
+//                HttpRequestBase oldReq = req;
+//                HttpRequestBase newReq = HttpRedirectHelper.getRedirect(req, response);
+//                cb.redirected(oldReq, response, newReq);
+//                //DOES NOT protect against circular redirects
+//                return doRequest(newReq, sessionKey, sessionSecret, cb);
+//            }
+//            else {
+//                return responsePair.getSecond();
+//            }
         }
         catch (Throwable e) {
             throw new StackMobException(e.getMessage());
@@ -182,5 +214,23 @@ public class HttpHelper {
         HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
         HttpConnectionParams.setConnectionTimeout(httpParams, CONN_TIMEOUT);
         HttpConnectionParams.setSoTimeout(httpParams, CONN_TIMEOUT);
+    }
+
+    public static class StackMobApi extends DefaultApi10a {
+
+        @Override
+        public String getRequestTokenEndpoint() {
+            return null;
+        }
+
+        @Override
+        public String getAccessTokenEndpoint() {
+            return null;
+        }
+
+        @Override
+        public String getAuthorizationUrl(Token token) {
+            return null;
+        }
     }
 }
