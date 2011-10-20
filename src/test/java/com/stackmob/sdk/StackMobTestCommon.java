@@ -32,8 +32,8 @@ import java.lang.reflect.Modifier;
 import static org.junit.Assert.*;
 
 public class StackMobTestCommon {
-    public static final String API_KEY = "YOUR_API_KEY_HERE";
-    public static final String API_SECRET = "YOUR_API_SECRET_HERE";
+    public static final String API_KEY = "8bce5b97-6018-4993-a690-4cc034aa2bfe";
+    public static final String API_SECRET = "c2227f24-7ad5-452f-8669-4a4a454c8fe4";
     public static final String USER_OBJECT_NAME = "user";
     public static final Integer API_VERSION_NUM = 0;
     public static final Long MAX_LATCH_WAIT_TIME_MS = 2000L;
@@ -99,6 +99,7 @@ public class StackMobTestCommon {
             stackmob.post(object.getName(), object, new StackMobCallback() {
                 @Override
                 public void success(String responseBody) {
+                    assertNotError(responseBody);
                     T obj = gson.fromJson(responseBody, objectClass);
                     assertNotNull(obj.getId());
                     ref.set(obj);
@@ -169,8 +170,15 @@ public class StackMobTestCommon {
         public String error;
     }
 
-    protected static final StackMobCallback EmptyCallback = new StackMobCallback() {
-        @Override public void success(String responseBody) {}
-        @Override public void failure(StackMobException e) {}
-    };
+    protected static void assertNotError(String responseBody) {
+        try {
+            Error err = gson.fromJson(responseBody, Error.class);
+            if(err.error != null) {
+                fail("request failed with error: " + err.error);
+            }
+        }
+        catch (Exception e) {
+            //do nothing
+        }
+    }
 }

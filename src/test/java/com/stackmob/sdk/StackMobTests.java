@@ -34,15 +34,20 @@ import static org.junit.Assert.*;
 
 public class StackMobTests extends StackMobTestCommon {
 
-    @Test public void loginShouldBeSucessful() {
+    @Test public void loginShouldBeSucessful() throws Exception {
+        final String username = "testUser";
+        final String password = "1234";
+        User user = StackMobObject.create(stackmob, new User(username, password), User.class);
+        user.password = password;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("username", "admin");
-        params.put("password", "1234");
+        params.put("username", user.username);
+        params.put("password", user.password);
 
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotNull(responseBody);
+                assertNotError(responseBody);
             }
             @Override
             public void failure(StackMobException e) {
@@ -51,6 +56,8 @@ public class StackMobTests extends StackMobTestCommon {
         };
 
         stackmob.login(params, callback);
+
+        StackMobObject.delete(stackmob, user.getName(), user.getId(), false);
     }
 
     @Test public void loginShouldFail() {
@@ -73,14 +80,21 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.login(params, callback);
     }
 
-    @Test public void logoutShouldBeSucessful() {
+    @Test public void logoutShouldBeSucessful() throws Exception {
+        final String username = "username";
+        final String password = "1234";
+
+        User user = StackMobObject.create(stackmob, new User(username, password), User.class);
+        user.password = password;
+
         Map<String, String> params = new HashMap<String, String>();
-        params.put("username", "admin");
-        params.put("password", "1234");
+        params.put("username", user.username);
+        params.put("password", user.password);
 
         stackmob.login(params, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
             }
 
             @Override
@@ -92,6 +106,7 @@ public class StackMobTests extends StackMobTestCommon {
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
             }
             @Override
@@ -101,12 +116,15 @@ public class StackMobTests extends StackMobTestCommon {
         };
 
         stackmob.logout(callback);
+
+        StackMobObject.delete(stackmob, user.getName(), user.getId(), true);
     }
 
     @Test public void startSession() {
         stackmob.startSession(new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
             }
 
@@ -121,6 +139,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.endSession(new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 System.out.println("endsession: " + responseBody);
                 assertNotNull(responseBody);
             }
@@ -138,6 +157,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.get("game", new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
                 Type collectionType = new TypeToken<List<Game>>() {}.getType();
                 List<Game> games = gson.fromJson(responseBody, collectionType);
@@ -160,6 +180,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.get("game", arguments, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
                 Type collectionType = new TypeToken<List<Game>>() {}.getType();
                 List<Game> games = gson.fromJson(responseBody, collectionType);
@@ -183,6 +204,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.get(query, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
                 Type collectionType = new TypeToken<List<Game>>() {}.getType();
                 List<Game> games = gson.fromJson(responseBody, collectionType);
@@ -205,6 +227,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.post("game", game, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 Game game = gson.fromJson(responseBody, Game.class);
                 assertEquals("newGame", game.name);
                 game.delete(stackmob);
@@ -223,6 +246,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.delete("game", game.game_id, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 assertNotNull(responseBody);
             }
 
@@ -244,6 +268,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.put(game.getName(), game.getId(), updatedGame, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
+                assertNotError(responseBody);
                 Game jsonGame = gson.fromJson(responseBody, Game.class);
                 assertNotNull(jsonGame);
                 assertNotNull(jsonGame.name);
@@ -271,7 +296,7 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.registerForPushWithUser(user.username, token, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-
+                assertNotError(responseBody);
             }
 
             @Override
