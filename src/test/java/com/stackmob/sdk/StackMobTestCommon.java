@@ -18,17 +18,7 @@ package com.stackmob.sdk;
 
 import com.google.gson.Gson;
 import com.stackmob.sdk.api.StackMob;
-import com.stackmob.sdk.callback.StackMobCallback;
-import com.stackmob.sdk.exception.StackMobException;
-import com.stackmob.sdk.api.StackMob;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.lang.reflect.Modifier;
-
-
+import com.stackmob.sdk.testobjects.Error;
 import static org.junit.Assert.*;
 
 public class StackMobTestCommon {
@@ -36,7 +26,6 @@ public class StackMobTestCommon {
     public static final String API_SECRET = "c2227f24-7ad5-452f-8669-4a4a454c8fe4";
     public static final String USER_OBJECT_NAME = "user";
     public static final Integer API_VERSION_NUM = 0;
-    public static final Long MAX_LATCH_WAIT_TIME_MS = 2000L;
     protected static final Gson gson = new Gson();
     protected final StackMob stackmob;
 
@@ -46,139 +35,18 @@ public class StackMobTestCommon {
         stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJECT_NAME, API_VERSION_NUM);
     }
 
-    protected abstract static class StackMobObject {
-
-        public abstract String getId();
-        public abstract String getName();
-
-        public void delete(StackMob stackmob) {
-            final String objectId = getId();
-            assertNotNull(objectId);
-            delete(stackmob, getName(), objectId, false);
-        }
-
-
-
-        public String toString() {
-            if(getId() != null) {
-                return "<"+getName()+" " + getId()+">";
-            }
-            else {
-                return "<"+getName()+">";
-            }
-        }
-
-        public static void delete(final StackMob stackmob, final String objectName, final String objectId, final Boolean ignoreFailure) {
-            final CountDownLatch latch = new CountDownLatch(1);
-            stackmob.delete(objectName, objectId, new StackMobCallback() {
-                @Override
-                public void success(String responseBody) {
-                    if(!ignoreFailure) {
-                        assertEquals("response body was " + responseBody, "Successfully deleted document", responseBody);
-                    }
-                    latch.countDown();
-                }
-
-                @Override
-                public void failure(StackMobException e) {
-                    fail("attempted to delete " + objectName + " " + objectId + " but failed: " + e.getMessage());
-                    latch.countDown();
-                }
-            });
-            try {
-                assertTrue(latch.await(MAX_LATCH_WAIT_TIME_MS, TimeUnit.MILLISECONDS));
-            }
-            catch (InterruptedException e) {
-                fail("trying to delete " + objectName + " " + objectId + " resulted in exception: " + e.getMessage());
-            }
-        }
-
-        public static <T extends StackMobObject> T create(final StackMob stackmob, final T object, final Class<T> objectClass) throws InterruptedException {
-            final AtomicReference<T> ref = new AtomicReference<T>();
-            final CountDownLatch latch = new CountDownLatch(1);
-            stackmob.post(object.getName(), object, new StackMobCallback() {
-                @Override
-                public void success(String responseBody) {
-                    assertNotError(responseBody);
-                    T obj = gson.fromJson(responseBody, objectClass);
-                    assertNotNull(obj.getId());
-                    ref.set(obj);
-                    latch.countDown();
-                }
-
-                @Override
-                public void failure(StackMobException e) {
-                    fail("creating " + object.getName() + " threw an exception: " + e.getMessage());
-                }
-            });
-            assertTrue(latch.await(MAX_LATCH_WAIT_TIME_MS, TimeUnit.MILLISECONDS));
-            return ref.get();
-        }
-    }
-
-    protected static class User extends StackMobObject {
-
-        public String username;
-        public String password;
-        public Long createddate;
-        public Long lastmoddate;
-
-        //this ctor is used for gson deserialization
-        public User(String username, String password, long createddate, long lastmoddate) {
-            this.username = username;
-            this.password = password;
-            this.createddate = createddate;
-            this.lastmoddate = lastmoddate;
-        }
-
-        public User(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        public String getName() { return "user"; }
-        public String getId() { return username; }
-    }
-
-    protected static class Game extends StackMobObject {
-
-        //public for the benefit of Gson
-        public List<String> players;
-        public String game_id;
-        public Long createddate;
-        public Long lastmoddate;
-        public String name;
-
-        public Game(List<String> players, String gameId, long createdDate, long lastModDate, String name) {
-            this(players, name);
-            this.game_id = gameId;
-            this.createddate = createdDate;
-            this.lastmoddate = lastModDate;
-        }
-
-        public Game(List<String> players, String name) {
-            this.players = players;
-            this.name = name;
-        }
-
-        public String getName() { return "game"; }
-        public String getId() { return game_id; }
-    }
-
-    //for capturing JSON errors with GSON
-    protected class Error {
-        public String error;
-    }
-
-    protected static void assertNotError(String responseBody) {
+    public static void assertNotError(String responseBody) {
         try {
             Error err = gson.fromJson(responseBody, Error.class);
-            if(err.error != null) {
-                fail("request failed with error: " + err.error);
-            }
+            assertNull("request failed with error: " + err.error, err.error);
         }
         catch (Exception e) {
             //do nothing
         }
+    }
+
+    public static void assertError(String responseBody) {
+        Error err = Error.decodeFromJson(responseBody, Error.class);
+        assertNotNull(err.error);
     }
 }

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.stackmob.sdk.net;
+package com.stackmob.sdk.testobjects;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import com.stackmob.sdk.util.Pair;
-import org.apache.http.util.EntityUtils;
+public class Error extends StackMobObject {
 
-import java.io.IOException;
+    public String error;
 
-public class NoopResponseHandler implements ResponseHandler<Pair<HttpResponse, String>> {
-    public Pair<HttpResponse, String> handleResponse(final HttpResponse response) throws IOException {
-        return new Pair<HttpResponse, String>(response, EntityUtils.toString(response.getEntity()));
+    public String getId() {
+        return error;
+    }
+
+    public String getName() {
+        return "Error";
     }
 }

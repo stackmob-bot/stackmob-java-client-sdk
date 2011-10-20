@@ -16,6 +16,8 @@
 
 package com.stackmob.sdk.api;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -25,16 +27,14 @@ import java.util.List;
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.net.HttpVerb;
-import com.stackmob.sdk.net.HttpHelper;
 import com.stackmob.sdk.push.StackMobPushToken;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 
 public class StackMob {
 
     private StackMobSession session;
     private String urlFormat = StackMobRequest.DEFAULT_URL_FORMAT;
     private final Object urlFormatLock = new Object();
+    private final CookieManager cookieMgr = new CookieManager();
 
     protected static class RegistrationIDAndUser {
         public String userId;
@@ -51,13 +51,13 @@ public class StackMob {
 
     protected StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
         @Override
-        public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {
+        public void redirected(String originalUrl, Map<String, String> redirectHeaders, String redirectBody, String newURL) {
             try {
-                URI uri = new URI(newRequest.getRequestLine().getUri());
+                URI uri = new URI(newURL);
                 synchronized(urlFormatLock) {
                     if (!urlFormat.equalsIgnoreCase(uri.getHost())) {
                         urlFormat = uri.getHost();
-                        userRedirectedCallback.redirected(origRequest, response, newRequest);
+                        userRedirectedCallback.redirected(originalUrl, redirectHeaders, redirectBody, newURL);
                     }
                 }
             }
@@ -77,6 +77,7 @@ public class StackMob {
      */
     public StackMob(String apiKey, String apiSecret, String userObjectName, String appName, Integer apiVersionNumber) {
         setSession(new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber));
+        CookieHandler.setDefault(cookieMgr);
     }
 
     /**
@@ -88,6 +89,7 @@ public class StackMob {
     */
     public StackMob(String apiKey, String apiSecret, String userObjectName, Integer apiVersionNumber) {
         setSession(new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber));
+        CookieHandler.setDefault(cookieMgr);
     }
 
     /**
@@ -152,14 +154,6 @@ public class StackMob {
      */
     public void startSession(StackMobCallback callback) {
         new StackMobRequest(this.session, "startsession", HttpVerb.POST, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
-    }
-
-    /**
-     * call the endsession method on stackmob
-     * @param callback callback to be called when the server returns. may execute in a separate thread
-     */
-    public void endSession(StackMobCallback callback) {
-        new StackMobRequest(this.session, "endsession", HttpVerb.POST, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
     ////////////////////
@@ -436,7 +430,6 @@ public class StackMob {
 
     private void setSession(StackMobSession session) {
         this.session = session;
-        HttpHelper.setVersion(this.session.getApiVersionNumber());
     }
 
     /**

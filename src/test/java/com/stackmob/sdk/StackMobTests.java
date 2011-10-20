@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.stackmob.sdk.api.StackMobQuery;
+import com.stackmob.sdk.testobjects.*;
 import org.junit.Test;
-import org.junit.Ignore;
 
 import com.google.gson.reflect.TypeToken;
 import com.stackmob.sdk.callback.StackMobCallback;
@@ -34,9 +34,11 @@ import static org.junit.Assert.*;
 
 public class StackMobTests extends StackMobTestCommon {
 
-    @Test public void loginShouldBeSucessful() throws Exception {
+    @Test public void login() throws Exception {
         final String username = "testUser";
         final String password = "1234";
+        new User(username, password).delete(stackmob, true);
+
         User user = StackMobObject.create(stackmob, new User(username, password), User.class);
         user.password = password;
         Map<String, String> params = new HashMap<String, String>();
@@ -56,20 +58,24 @@ public class StackMobTests extends StackMobTestCommon {
         };
 
         stackmob.login(params, callback);
-
-        StackMobObject.delete(stackmob, user.getName(), user.getId(), false);
+        user.delete(stackmob);
     }
 
     @Test public void loginShouldFail() {
+        final String username = "doesntexist";
+        final String password = "doesntexist";
+
+        new User(username, password).delete(stackmob, true);
+
         Map<String, String> params = new HashMap<String, String>();
-        params.put("username", "idonotexist");
-        params.put("password", "ghost");
+        params.put("username", username);
+        params.put("password", password);
+
 
         StackMobCallback callback = new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-                Error err = gson.fromJson(responseBody, Error.class);
-                assertNotNull(err.error);
+                assertError(responseBody);
             }
             @Override
             public void failure(StackMobException e) {
@@ -80,9 +86,11 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.login(params, callback);
     }
 
-    @Test public void logoutShouldBeSucessful() throws Exception {
+    @Test public void logout() throws Exception {
         final String username = "username";
         final String password = "1234";
+
+        new User(username, password).delete(stackmob, true);
 
         User user = StackMobObject.create(stackmob, new User(username, password), User.class);
         user.password = password;
@@ -103,7 +111,7 @@ public class StackMobTests extends StackMobTestCommon {
             }
         });
 
-        StackMobCallback callback = new StackMobCallback() {
+        stackmob.logout(new StackMobCallback() {
             @Override
             public void success(String responseBody) {
                 assertNotError(responseBody);
@@ -113,11 +121,9 @@ public class StackMobTests extends StackMobTestCommon {
             public void failure(StackMobException e) {
                 fail(e.getMessage());
             }
-        };
+        });
 
-        stackmob.logout(callback);
-
-        StackMobObject.delete(stackmob, user.getName(), user.getId(), true);
+        user.delete(stackmob);
     }
 
     @Test public void startSession() {
@@ -125,22 +131,6 @@ public class StackMobTests extends StackMobTestCommon {
             @Override
             public void success(String responseBody) {
                 assertNotError(responseBody);
-                assertNotNull(responseBody);
-            }
-
-            @Override
-            public void failure(StackMobException e) {
-                fail(e.getMessage());
-            }
-        });
-    }
-
-    @Test @Ignore("endsession is currently returning 404") public void endSession() {
-        stackmob.endSession(new StackMobCallback() {
-            @Override
-            public void success(String responseBody) {
-                assertNotError(responseBody);
-                System.out.println("endsession: " + responseBody);
                 assertNotNull(responseBody);
             }
 
@@ -197,7 +187,7 @@ public class StackMobTests extends StackMobTestCommon {
     }
 
     @Test
-    public void testGetQuery() throws Exception {
+    public void getWithQuery() throws Exception {
         StackMobObject.create(stackmob, new Game(Arrays.asList("seven", "six"), "woot"), Game.class);
 
         StackMobQuery query = new StackMobQuery("game").fieldIsGreaterThanOrEqualTo("name", "sup");
@@ -240,7 +230,7 @@ public class StackMobTests extends StackMobTestCommon {
         });
     }
 
-    @Test public void testDeleteWithId() throws Exception {
+    @Test public void deleteWithId() throws Exception {
         Game game = StackMobObject.create(stackmob, new Game(new ArrayList<String>(), "gameToDelete"), Game.class);
 
         stackmob.delete("game", game.game_id, new StackMobCallback() {
@@ -288,10 +278,10 @@ public class StackMobTests extends StackMobTestCommon {
         final String password = "password";
         final String token = "testToken";
 
-        StackMobObject.delete(stackmob, "user", "testUser", true);
+        new User(username, password).delete(stackmob, true);
 
         final User user = StackMobObject.create(stackmob, new User(username, password), User.class);
-
+        user.password = password;
 
         stackmob.registerForPushWithUser(user.username, token, new StackMobCallback() {
             @Override

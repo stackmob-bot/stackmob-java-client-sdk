@@ -16,7 +16,6 @@
 
 package com.stackmob.sdk.api;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,20 +28,26 @@ import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import com.stackmob.sdk.push.StackMobPushToken;
 import com.stackmob.sdk.push.StackMobPushTokenDeserializer;
 import com.stackmob.sdk.push.StackMobPushTokenSerializer;
-import org.apache.http.HttpEntity;
+import com.stackmob.sdk.util.Pair;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import com.google.gson.Gson;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
-import com.stackmob.sdk.net.HttpHelper;
 import com.stackmob.sdk.net.HttpVerb;
+import org.scribe.model.Response;
+import org.scribe.oauth.OAuthService;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.builder.ServiceBuilder;
+
+import com.stackmob.sdk.net.StackMobApi;
+import com.stackmob.sdk.net.HttpRedirectHelper;
 
 public class StackMobRequest {
 
@@ -63,6 +68,8 @@ public class StackMobRequest {
     protected Object requestObject;
 
     protected Gson gson;
+
+    private OAuthService oAuthService;
 
     //default to doing nothing
     protected StackMobCallback callback = new StackMobCallback() {
@@ -85,6 +92,8 @@ public class StackMobRequest {
                                   .registerTypeAdapter(StackMobPushToken.class, new StackMobPushTokenSerializer())
                                   .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.TRANSIENT, Modifier.STATIC);
         gson = gsonBuilder.create();
+
+        oAuthService = new ServiceBuilder().provider(StackMobApi.class).apiKey(sessionKey).apiSecret(sessionSecret).build();
     }
 
     public StackMobRequest(StackMobSession session, String method, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
@@ -143,130 +152,63 @@ public class StackMobRequest {
     }
 
     private String formatQueryString(List<NameValuePair> nameValuePairs) {
-        //return URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
-        String ret = URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
-        return ret;
-//        return ret.replace("%5B", "[").replace("%5D", "]");//replace is a hack to make sure that the encoder does not encode [ or ]
-        /*
-        String url = "";
-        for(NameValuePair nameValuePair : nameValuePairs) {
-            url = OAuth.addQueryParameters(url, nameValuePair.getName(), nameValuePair.getValue());
-        }
-        return url.substring(1);
-        */
+        return URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
     }
 
     private String sendGetRequest() throws StackMobException {
-        URI uri;
-        String ret;
-
         try {
             String query = null;
             if (null != params) {
                 query = formatQueryString(getParamsForRequest());
             }
 
-            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            if(session.getAppName() != null) {
-                ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
-            }
-            else {
-                ret = HttpHelper.doGet(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
-            }
+            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            OAuthRequest req = getOAuthRequest(HttpVerb.GET, uri.toString());
+            return sendRequest(req);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
         }
-
-        return ret;
     }
 
     private String sendPostRequest() throws StackMobException {
-        URI uri;
-        String ret;
-
         try {
-            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
-
-            HttpEntity entity = null;
-            if (null != params) {
-                entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
-            }
-            else if (null != requestObject) {
-                entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
-            }
-
-            if(session.getAppName() != null) {
-                ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
-            }
-            else {
-                ret = HttpHelper.doPost(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
-            }
-
+            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
+            String payload = getPayload();
+            OAuthRequest req = getOAuthRequest(HttpVerb.POST, uri.toString(), payload);
+            return sendRequest(req);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
         }
-        catch (UnsupportedEncodingException e) {
-            throw new StackMobException(e.getMessage());
-        }
-        return ret;
     }
 
     private String sendPutRequest() throws StackMobException {
-        URI uri;
-        String ret;
-
         try {
-            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
-
-            HttpEntity entity = null;
-            if (null != params) {
-                entity = new UrlEncodedFormEntity(getParamsForRequest(), HTTP.UTF_8);
-            }
-            else if (null != requestObject) {
-                entity = new StringEntity(gson.toJson(requestObject), HTTP.UTF_8);
-            }
-            if(session.getAppName() != null) {
-                ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
-            }
-            else {
-                ret = HttpHelper.doPut(uri, entity, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
-            }
+            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
+            String payload = getPayload();
+            OAuthRequest req = getOAuthRequest(HttpVerb.PUT, uri.toString(), payload);
+            return sendRequest(req);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
         }
-        catch (UnsupportedEncodingException e) {
-            throw new StackMobException(e.getMessage());
-        }
-
-        return ret;
     }
 
     private String sendDeleteRequest() throws StackMobException {
-        URI uri;
-        String ret;
-
         try {
             String query = null;
             if (null != params) {
-                query = URLEncodedUtils.format(getParamsForRequest(), HTTP.UTF_8);
+                query = formatQueryString(getParamsForRequest());
             }
 
-            uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
-            if(session.getAppName() != null) {
-                ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getAppName(), session.getApiVersionNumber(), redirectedCallback);
-            }
-            else {
-                ret = HttpHelper.doDelete(uri, sessionKey, sessionSecret, session.getApiVersionNumber(), redirectedCallback);
-            }
+            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            OAuthRequest req = getOAuthRequest(HttpVerb.DELETE, uri.toString());
+            return sendRequest(req);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
         }
-
-        return ret;
     }
 
     protected String getPath() {
@@ -303,4 +245,67 @@ public class StackMobRequest {
 
         return ret;
     }
+
+    private String getPayload() {
+        String payload = "";
+        if(null != params) {
+            payload = formatQueryString(getParamsForRequest());
+        }
+        else if(null != requestObject) {
+            payload = gson.toJson(requestObject);
+        }
+        return payload;
+    }
+
+    private OAuthRequest getOAuthRequest(HttpVerb method, String url) {
+        OAuthRequest oReq = new OAuthRequest(Verb.valueOf(method.toString()), url);
+        int apiVersion = session.getApiVersionNumber();
+        final String contentType = "application/vnd.stackmob+json;";
+        final String accept = contentType + " version="+apiVersion;
+        String userAgentIntermediate = "StackMob Java Client; " + apiVersion;
+        if(session.getAppName() != null) {
+            userAgentIntermediate += "/"+session.getAppName();
+        }
+        final String userAgent = userAgentIntermediate;
+        List<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+        headers.add(new Pair<String, String>("Content-Type", contentType));
+        headers.add(new Pair<String, String>("Accept", accept));
+        headers.add(new Pair<String, String>("User-Agent", userAgent));
+        for(Pair<String, String> header: headers) {
+            oReq.addHeader(header.getFirst(), header.getSecond());
+        }
+
+        oAuthService.signRequest(new Token("", ""), oReq);
+        return oReq;
+    }
+
+    private OAuthRequest getOAuthRequest(HttpVerb method, String url, String payload) {
+        OAuthRequest req = getOAuthRequest(method, url);
+        req.addPayload(payload);
+        return req;
+    }
+
+    private String sendRequest(OAuthRequest req) {
+        Response ret = req.send();
+        if(HttpRedirectHelper.isRedirected(ret.getCode())) {
+            try {
+                String newLocation = HttpRedirectHelper.getNewLocation(ret.getHeaders());
+                HttpVerb verb = HttpVerb.valueOf(req.getVerb().toString());
+                OAuthRequest newReq = getOAuthRequest(verb, newLocation);
+                if(req.getBodyContents() != null && req.getBodyContents().length() > 0) {
+                    newReq = getOAuthRequest(verb, newLocation, req.getBodyContents());
+                }
+                //does NOT protect against circular redirects
+                redirectedCallback.redirected(req.getUrl(), ret.getHeaders(), ret.getBody(), newReq.getUrl());
+                return sendRequest(newReq);
+            }
+            catch(Exception e) {
+                return ret.getBody();
+            }
+        }
+        else {
+            return ret.getBody();
+        }
+    }
+
 }

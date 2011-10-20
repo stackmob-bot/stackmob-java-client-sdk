@@ -14,10 +14,25 @@
  * limitations under the License.
  */
 
-package com.stackmob.sdk.callback;
+package com.stackmob.sdk.net;
 
-import java.util.Map;
+import org.scribe.builder.api.DefaultApi10a;
+import org.scribe.model.Token;
 
-public interface StackMobRedirectedCallback {
-    void redirected(String originalUrl, Map<String, String> redirectHeaders, String redirectBody, String newURL);
+public class StackMobApi extends DefaultApi10a {
+
+    @Override
+    public String getRequestTokenEndpoint() {
+        return null;
+    }
+
+    @Override
+    public String getAccessTokenEndpoint() {
+        return null;
+    }
+
+    @Override
+    public String getAuthorizationUrl(Token token) {
+        return null;
+    }
 }

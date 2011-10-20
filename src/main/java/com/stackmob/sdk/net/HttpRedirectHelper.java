@@ -16,43 +16,35 @@
 
 package com.stackmob.sdk.net;
 
-import com.stackmob.sdk.callback.StackMobRedirectedCallback;
-import org.apache.http.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.protocol.HttpContext;
-
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Arrays;
+import java.util.Map;
 
 public class HttpRedirectHelper {
-    public static final int RedirectStatusCode = HttpStatus.SC_MOVED_TEMPORARILY;//302
+    public static final int RedirectStatusCode = 302;
 
     /**
      * get the new request that represents the redirect if there is one
-     * @param oldRequest the original request that you made
-     * @param response the response that came back
+     * @param headers the headers from which to get the new loc
      * @return the new request to make. NOTE: if a redirect happened, setURI will be called on oldRequest and the result is returned, so your original request will be modified in place.
-     * @throws ProtocolException if there is a problem parsing headers to get the redirect URL
+     * @throws Exception if there was a problem getting the redirect location
      * @throws URISyntaxException if there is a problem parsing the redirect URL
      */
-    public static HttpRequestBase getRedirect(HttpRequestBase oldRequest, HttpResponse response) throws ProtocolException, URISyntaxException {
-        if(!isRedirected(response)) {
-            return oldRequest;
-        }
+    public static String getNewLocation(Map<String, String> headers) throws Exception {
 
-        List<Header> newLocHeaders = Arrays.asList(response.getHeaders(HttpHeaders.LOCATION));
-        if (newLocHeaders.size() < 1) {
-            throw new ProtocolException(RedirectStatusCode + " given for redirect, but no location given");
+        String loc = null;
+        for(String key : headers.keySet()) {
+            if(key.toLowerCase().equals("location")) {
+                loc = headers.get(key);
+            }
         }
-        oldRequest.setURI(new URI(newLocHeaders.get(0).getValue()));
-        return oldRequest;
+        if(loc == null) {
+            throw new Exception("redirect location requested but it was non existent in headers");
+        }
+        return loc;
     }
 
-    public static boolean isRedirected(HttpResponse response) {
-        return response.getStatusLine().getStatusCode() == RedirectStatusCode;
+    public static boolean isRedirected(int responseCode) {
+        return responseCode == RedirectStatusCode;
     }
 
 }
