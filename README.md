@@ -86,6 +86,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 
 final Gson gson = new Gson();
+
+...
+
+StackMob stackmob = new StackMob(API_KEY, API_SECRET, USER_OBJ_NAME, API_VERSION);
+
+...
+
 //this query represents all myobject objects named "object1" or "object2" that were created between 10 and 50 milliseconds ago (inclusive)
 long curTime = System.currentTimeMillis();
 StackMobQuery q = new StackMobQuery("myobject")
