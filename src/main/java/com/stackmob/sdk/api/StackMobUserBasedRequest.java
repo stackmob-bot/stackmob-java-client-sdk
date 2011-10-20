@@ -26,7 +26,7 @@ public class StackMobUserBasedRequest extends StackMobRequest {
         isSecure = true;
     }
 
-    public StackMobUserBasedRequest(StackMobSession session, String method, Map<String, Object> params, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
+    public StackMobUserBasedRequest(StackMobSession session, String method, Map<String, String> params, StackMobCallback callback, StackMobRedirectedCallback redirCB) {
         super(session, method, params, callback, redirCB);
         isSecure = true;
     }

@@ -16,12 +16,10 @@
 
 package com.stackmob.sdk;
 
-import com.stackmob.sdk.api.StackMob;
 import com.stackmob.sdk.api.StackMobRequest;
 import com.stackmob.sdk.api.StackMobSession;
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
+import com.stackmob.sdk.testobjects.Error;
 import org.junit.Test;
 import org.junit.Ignore;
 import static org.junit.Assert.*;
@@ -30,12 +28,12 @@ import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.exception.StackMobException;
 import com.stackmob.sdk.net.HttpVerb;
 
-import static com.stackmob.sdk.StackMobTestCommon.*;
+import java.util.Map;
 
 public class StackMobRequestTests extends StackMobTestCommon {
     private StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
       @Override
-      public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {
+      public void redirected(String originalUrl, Map<String, String> redirectHeaders, String redirectBody, String newURL) {
         //do nothing
       }
     };
@@ -112,7 +110,8 @@ public class StackMobRequestTests extends StackMobTestCommon {
         StackMobRequest request = new StackMobRequest(session, "inexistent", new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-                fail("Inexistent method should fail");
+                Error err = gson.fromJson(responseBody, Error.class);
+                assertNotNull(err.error);
             }
             @Override
             public void failure(StackMobException e) {

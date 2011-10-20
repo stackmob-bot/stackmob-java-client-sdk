@@ -16,6 +16,8 @@
 
 package com.stackmob.sdk.api;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -25,16 +27,14 @@ import java.util.List;
 import com.stackmob.sdk.callback.StackMobRedirectedCallback;
 import com.stackmob.sdk.callback.StackMobCallback;
 import com.stackmob.sdk.net.HttpVerb;
-import com.stackmob.sdk.net.HttpHelper;
 import com.stackmob.sdk.push.StackMobPushToken;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 
 public class StackMob {
 
     private StackMobSession session;
     private String urlFormat = StackMobRequest.DEFAULT_URL_FORMAT;
     private final Object urlFormatLock = new Object();
+    private final CookieManager cookieMgr = new CookieManager();
 
     protected static class RegistrationIDAndUser {
         public String userId;
@@ -51,13 +51,13 @@ public class StackMob {
 
     protected StackMobRedirectedCallback redirectedCallback = new StackMobRedirectedCallback() {
         @Override
-        public void redirected(HttpRequest origRequest, HttpResponse response, HttpRequest newRequest) {
+        public void redirected(String originalUrl, Map<String, String> redirectHeaders, String redirectBody, String newURL) {
             try {
-                URI uri = new URI(newRequest.getRequestLine().getUri());
+                URI uri = new URI(newURL);
                 synchronized(urlFormatLock) {
                     if (!urlFormat.equalsIgnoreCase(uri.getHost())) {
                         urlFormat = uri.getHost();
-                        userRedirectedCallback.redirected(origRequest, response, newRequest);
+                        userRedirectedCallback.redirected(originalUrl, redirectHeaders, redirectBody, newURL);
                     }
                 }
             }
@@ -76,7 +76,8 @@ public class StackMob {
      * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
      */
     public StackMob(String apiKey, String apiSecret, String userObjectName, String appName, Integer apiVersionNumber) {
-        setSession(new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber));
+        this.session = new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber);
+        CookieHandler.setDefault(cookieMgr);
     }
 
     /**
@@ -87,7 +88,8 @@ public class StackMob {
     * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
     */
     public StackMob(String apiKey, String apiSecret, String userObjectName, Integer apiVersionNumber) {
-        setSession(new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber));
+        this.session = new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber);
+        CookieHandler.setDefault(cookieMgr);
     }
 
     /**
@@ -134,7 +136,7 @@ public class StackMob {
      * @param params parameters to pass to the login method
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
-    public void login(Map<String, Object> params, StackMobCallback callback) {
+    public void login(Map<String, String> params, StackMobCallback callback) {
         new StackMobUserBasedRequest(session, "login", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
@@ -154,14 +156,6 @@ public class StackMob {
         new StackMobRequest(this.session, "startsession", HttpVerb.POST, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
-    /**
-     * call the endsession method on stackmob
-     * @param callback callback to be called when the server returns. may execute in a separate thread
-     */
-    public void endSession(StackMobCallback callback) {
-        new StackMobRequest(this.session, "endsession", HttpVerb.POST, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
-    }
-
     ////////////////////
     //social
     ////////////////////
@@ -173,7 +167,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void twitterLogin(String token, String secret, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
         new StackMobUserBasedRequest(this.session, "twitterlogin", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -185,7 +179,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void twitterStatusUpdate(String message, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_st", message);
         new StackMobUserBasedRequest(this.session, "twitterStatusUpdate", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
@@ -198,7 +192,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void registerWithTwitterToken(String token, String secret, String username, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
         params.put("username", username);
@@ -212,7 +206,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void linkUserWithTwitterToken(String token, String secret, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("tw_tk", token);
         params.put("tw_ts", secret);
 
@@ -225,7 +219,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void facebookLogin(String token, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
 
         new StackMobUserBasedRequest(this.session, "facebookLogin", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -238,7 +232,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void registerWithFacebookToken(String token, String username, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
         params.put("username", username);
 
@@ -251,7 +245,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void linkUserWithFacebookToken(String token, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("fb_at", token);
 
         new StackMobUserBasedRequest(this.session, "linkUserWithFacebook", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -263,7 +257,7 @@ public class StackMob {
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
     public void facebookPostMessage(String msg, StackMobCallback callback) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, String> params = new HashMap<String, String>();
         params.put("message", msg);
 
         new StackMobUserBasedRequest(this.session, "postFacebookMessage", params, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
@@ -391,8 +385,16 @@ public class StackMob {
      * @param arguments arguments to be encoded into the query string of the get request
      * @param callback callback to be called when the server returns. may execute in a separate thread
      */
-    public void get(String path, Map<String, Object> arguments, StackMobCallback callback) {
+    public void get(String path, Map<String, String> arguments, StackMobCallback callback) {
         new StackMobRequest(this.session, path, arguments, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
+    }
+
+    public void get(StackMobQuery query, StackMobCallback callback) {
+        this.get("/"+query.getObjectName(), query.getArguments(), callback);
+    }
+
+    public void get(StackMobQueryWithField query, StackMobCallback callback) {
+        this.get(query.getQuery(), callback);
     }
 
     /**
@@ -426,11 +428,6 @@ public class StackMob {
         new StackMobRequest(this.session, path + "/" + id, HttpVerb.DELETE, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
-    private void setSession(StackMobSession session) {
-        this.session = session;
-        HttpHelper.setVersion(this.session.getApiVersionNumber());
-    }
-
     /**
      * get the session that this StackMob object contains
      * @return the session
@@ -438,5 +435,4 @@ public class StackMob {
     public StackMobSession getSession() {
         return session;
     }
-
 }
