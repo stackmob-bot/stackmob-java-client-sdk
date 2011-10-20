@@ -145,7 +145,8 @@ public class StackMobRequest {
     private String formatQueryString(List<NameValuePair> nameValuePairs) {
         //return URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
         String ret = URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
-        return ret.replace("%5B", "[").replace("%5D", "]");//replace is a hack to make sure that the encoder does not encode [ or ]
+        return ret;
+//        return ret.replace("%5B", "[").replace("%5D", "]");//replace is a hack to make sure that the encoder does not encode [ or ]
         /*
         String url = "";
         for(NameValuePair nameValuePair : nameValuePairs) {
