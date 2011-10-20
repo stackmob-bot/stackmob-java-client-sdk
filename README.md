@@ -33,8 +33,8 @@ libraryDependencies += "com.stackmob" % "stackmob-java-client-sdk" % "0.1.4"
 [Download this JAR](http://search.maven.org/remotecontent?filepath=com/stackmob/stackmob-java-client-sdk/0.1.4/stackmob-java-client-sdk-0.1.4.jar) and put it on your CLASSPATH
 
 ## Coding
-
-The main interface to your app on StackMob's servers is through the com.stackmob.sdk.api.StackMob object. The following code shows how to create a new object using this object:
+The main interface to your app on StackMob's servers is through the com.stackmob.sdk.api.StackMob object. Check out the [javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.5/apidocs/) for details.
+The following code shows basic use of the StackMob object.
 
 ```java
 import com.stackmob.sdk.api.StackMob;
@@ -65,19 +65,45 @@ MyObject object = new MyObject("test object");
 
 //create an object
 stackmob.post("myobject", object, new StackMobCallback() {
-    @Override
-    public void success(String responseBody) {
+    @Override public void success(String responseBody) {
         //handle the successul set
     }
-    @Override
-    public void failure(StackMobException e) {
-        //handle a failure
+    @Override public void failure(StackMobException e) {
+        //handle the failure
     }
 });
 ```
 
-Once you have it, you can use the StackMob object to execute a wide range of operations against your app on StackMob's servers. Check out the
-[javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.4/apidocs/) for more.
+### Advanced Querying
+The SDK includes StackMobQuery and StackMobQueryWithField classes to make building large queries easier than building up a Map of parameters. Here's how to use them:
+
+```java
+import com.stackmob.sdk.api.StackMobQuery;
+import com.stackmob.sdk.api.StackMobQueryWithField;
+import java.util.Arrays;
+import java.util.List;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.Gson;
+
+final Gson gson = new Gson();
+//this query represents all myobject objects named "object1" or "object2" that were created between 10 and 50 milliseconds ago (inclusive)
+long curTime = System.currentTimeMillis();
+StackMobQuery q = new StackMobQuery("myobject")
+    .field("objectName").in(Arrays.asList("object1", "object2"))
+    .field("createddate").isLessThanOrEqualTo(curTime - 10).isLessThanOrEqualTo(curTime - 50);
+
+stackmob.get(q, new StackMobCallback() {
+    @Override public void success(String responseBody) {
+        //responseBody will be a list of MyObject instances
+        Type myObjectListType = new TypeToken<List<MyObject>>() {}.getType();
+        List<MyObject> objects = gson.fromJson(responseBody, collectionType);
+        //do something with your objects
+    }
+    @Override public void failure(StackMobException e) {
+        //handle the failure
+    }
+});
+```
 
 ## Issues
 We use Github to track issues with the SDK. If you find any issues, please report them [here](https://github.com/stackmob/stackmob-java-client-sdk/issues), and include as many details as possible about the issue you encountered.

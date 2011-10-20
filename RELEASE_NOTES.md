@@ -1,5 +1,12 @@
 # Stackmob Java SDK (Release Notes)
 
+### 0.1.5 (10/20/2011)
+* Added the StackMobQuery class to assist with building complex query operations (ie: <, >, <=, =>, IN)
+	* See [Javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.5/apidocs) and [README](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.5/apidocs) for more details
+* Overhaul of OAuth signing process & removed httpclient & signpost dependencies
+* Fixed bug with login where it was not correctly saving the login cookie
+* Changed StackMobRedirectCallback interface. See [Javadoc](http://stackmob.github.com/stackmob-java-client-sdk/javadoc/0.1.5/apidocs/com/stackmob/sdk/callback/StackMobRedirectedCallback.html) for more.
+
 ### 0.1.4 (10/17/2011)
 * StackMob Push REST API support
 
