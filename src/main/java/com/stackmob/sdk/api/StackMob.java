@@ -76,7 +76,7 @@ public class StackMob {
      * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
      */
     public StackMob(String apiKey, String apiSecret, String userObjectName, String appName, Integer apiVersionNumber) {
-        setSession(new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber));
+        this.session = new StackMobSession(apiKey, apiSecret, userObjectName, appName, apiVersionNumber);
         CookieHandler.setDefault(cookieMgr);
     }
 
@@ -88,7 +88,7 @@ public class StackMob {
     * @param apiVersionNumber the version of your app's API that you want to use with this StackMob session. pass 0 for sandbox
     */
     public StackMob(String apiKey, String apiSecret, String userObjectName, Integer apiVersionNumber) {
-        setSession(new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber));
+        this.session = new StackMobSession(apiKey, apiSecret, userObjectName, apiVersionNumber);
         CookieHandler.setDefault(cookieMgr);
     }
 
@@ -428,10 +428,6 @@ public class StackMob {
         new StackMobRequest(this.session, path + "/" + id, HttpVerb.DELETE, callback, redirectedCallback).setUrlFormat(urlFormat).sendRequest();
     }
 
-    private void setSession(StackMobSession session) {
-        this.session = session;
-    }
-
     /**
      * get the session that this StackMob object contains
      * @return the session
@@ -439,5 +435,4 @@ public class StackMob {
     public StackMobSession getSession() {
         return session;
     }
-
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.stackmob.sdk.api.StackMobQuery;
+import com.stackmob.sdk.api.StackMobQueryWithField;
 import com.stackmob.sdk.testobjects.*;
 import org.junit.Test;
 
@@ -194,8 +195,8 @@ public class StackMobTests extends StackMobTestCommon {
         stackmob.get(query, new StackMobCallback() {
             @Override
             public void success(String responseBody) {
-                assertNotError(responseBody);
                 assertNotNull(responseBody);
+                assertNotError(responseBody);
                 Type collectionType = new TypeToken<List<Game>>() {}.getType();
                 List<Game> games = gson.fromJson(responseBody, collectionType);
                 assertNotNull(games);
@@ -208,6 +209,33 @@ public class StackMobTests extends StackMobTestCommon {
                 fail(e.getMessage());
             }
         });
+    }
+
+    @Test
+    public void getWithQueryWithField() throws Exception {
+        Game g = StackMobObject.create(stackmob, new Game(Arrays.asList("seven", "six"), "woot"), Game.class);
+
+        StackMobQuery q = new StackMobQuery("game");
+        StackMobQueryWithField qWithField = new StackMobQueryWithField("name", q).isGreaterThanOrEqualTo("sup");
+        stackmob.get(qWithField, new StackMobCallback() {
+            @Override
+            public void success(String responseBody) {
+                assertNotNull(responseBody);
+                assertNotError(responseBody);
+                Type collectionType = new TypeToken<List<Game>>() {}.getType();
+                List<Game> games = gson.fromJson(responseBody, collectionType);
+                assertNotNull(games);
+                assertTrue(games.size() >= 1);
+                assertEquals("woot", games.get(0).name);
+                games.get(0).delete(stackmob);
+            }
+
+            @Override
+            public void failure(StackMobException e) {
+                fail(e.getMessage());
+            }
+        });
+        g.delete(stackmob, true);
     }
 
     @Test
@@ -271,7 +299,6 @@ public class StackMobTests extends StackMobTestCommon {
             }
         });
     }
-
 
     @Test public void registerToken() throws Exception {
         final String username = "testUser";

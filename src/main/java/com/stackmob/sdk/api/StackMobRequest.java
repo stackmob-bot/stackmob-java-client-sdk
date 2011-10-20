@@ -16,10 +16,13 @@
 
 package com.stackmob.sdk.api;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +32,6 @@ import com.stackmob.sdk.push.StackMobPushToken;
 import com.stackmob.sdk.push.StackMobPushTokenDeserializer;
 import com.stackmob.sdk.push.StackMobPushTokenSerializer;
 import com.stackmob.sdk.util.Pair;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 
 import com.google.gson.Gson;
 import com.stackmob.sdk.callback.StackMobCallback;
@@ -151,10 +149,6 @@ public class StackMobRequest {
         }
     }
 
-    private String formatQueryString(List<NameValuePair> nameValuePairs) {
-        return URLEncodedUtils.format(nameValuePairs, HTTP.UTF_8);
-    }
-
     private String sendGetRequest() throws StackMobException {
         try {
             String query = null;
@@ -162,7 +156,7 @@ public class StackMobRequest {
                 query = formatQueryString(getParamsForRequest());
             }
 
-            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            URI uri = createURI(getScheme(), getHost(), getPath(), query);
             OAuthRequest req = getOAuthRequest(HttpVerb.GET, uri.toString());
             return sendRequest(req);
         }
@@ -173,7 +167,7 @@ public class StackMobRequest {
 
     private String sendPostRequest() throws StackMobException {
         try {
-            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), null, null);
+            URI uri = createURI(getScheme(), getHost(), getPath(), "");
             String payload = getPayload();
             OAuthRequest req = getOAuthRequest(HttpVerb.POST, uri.toString(), payload);
             return sendRequest(req);
@@ -185,7 +179,7 @@ public class StackMobRequest {
 
     private String sendPutRequest() throws StackMobException {
         try {
-            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(),null, null);
+            URI uri = createURI(getScheme(), getHost(), getPath(), "");
             String payload = getPayload();
             OAuthRequest req = getOAuthRequest(HttpVerb.PUT, uri.toString(), payload);
             return sendRequest(req);
@@ -202,13 +196,27 @@ public class StackMobRequest {
                 query = formatQueryString(getParamsForRequest());
             }
 
-            URI uri = URIUtils.createURI(getScheme(), getHost(), -1, getPath(), query, null);
+            URI uri = createURI(getScheme(), getHost(), getPath(), query);
             OAuthRequest req = getOAuthRequest(HttpVerb.DELETE, uri.toString());
             return sendRequest(req);
         }
         catch (URISyntaxException e) {
             throw new StackMobException(e.getMessage());
         }
+    }
+
+    private URI createURI(String scheme, String host, String path, String query) throws URISyntaxException {
+        StringBuilder uriBuilder = new StringBuilder().append(scheme).append("://").append(host);
+        if(!path.startsWith("/")) {
+            uriBuilder.append("/");
+        }
+        uriBuilder.append(path);
+
+        if(query != null && query.length() > 0) {
+            uriBuilder.append("?").append(query);
+        }
+
+        return new URI(uriBuilder.toString());
     }
 
     protected String getPath() {
@@ -233,16 +241,35 @@ public class StackMobRequest {
         return urlFormat;
     }
 
-    private List<NameValuePair> getParamsForRequest() {
-        if (null == params) {
-            return null;
-        }
+    private String percentEncode(String s) throws UnsupportedEncodingException {
+        return URLEncoder.encode(s, "UTF-8").replace("+", "%20");
+    }
 
-        List<NameValuePair> ret = new ArrayList<NameValuePair>(params.size());
-        for (String key : params.keySet()) {
-            ret.add(new BasicNameValuePair(key, params.get(key)));
+    private String formatQueryString(Map<String, String> params) {
+        StringBuilder formatBuilder = new StringBuilder();
+        boolean first = true;
+        for(String key : params.keySet()) {
+            if(!first) {
+                formatBuilder.append("&");
+            }
+            first = false;
+            String value = params.get(key);
+            try {
+                formatBuilder.append(percentEncode(key)).append("=").append(percentEncode(value));
+            }
+            catch(UnsupportedEncodingException e) {
+                //do nothing
+            }
         }
+        return formatBuilder.toString();
+    }
 
+
+    private Map<String, String> getParamsForRequest() {
+        Map<String, String> ret = new HashMap<String, String>();
+        if (null != params) {
+            ret = params;
+        }
         return ret;
     }
 
